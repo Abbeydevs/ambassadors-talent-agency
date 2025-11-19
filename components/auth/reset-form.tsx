@@ -14,14 +14,6 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  CardDescription,
-  CardFooter,
-} from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
@@ -51,16 +43,18 @@ export const ResetForm = () => {
   };
 
   return (
-    <Card className="w-[400px] shadow-md">
-      <CardHeader>
-        <CardTitle className="text-2xl font-bold text-center text-[#1E40AF]">
-          Forgot Password
-        </CardTitle>
-        <CardDescription className="text-center">
-          Enter your email to reset your password
-        </CardDescription>
-      </CardHeader>
-      <CardContent>
+    <div className="w-full space-y-8 animate-in fade-in duration-500">
+      <div className="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-8 shadow-2xl">
+        <div className="space-y-3 mb-8">
+          <h1 className="text-3xl font-bold text-white tracking-tight">
+            Forgot Password?
+          </h1>
+          <p className="text-gray-300">
+            Enter your email address and we&apos;ll send you instructions to
+            reset your password
+          </p>
+        </div>
+
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <FormField
@@ -68,44 +62,145 @@ export const ResetForm = () => {
               name="email"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Email</FormLabel>
+                  <FormLabel className="text-sm font-medium text-gray-200">
+                    Email Address
+                  </FormLabel>
                   <FormControl>
                     <Input
                       {...field}
                       disabled={isPending}
                       placeholder="john.doe@example.com"
                       type="email"
+                      className="h-11 bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:bg-white/20 focus:border-[#60A5FA] transition-all duration-200 backdrop-blur-sm"
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-red-300" />
                 </FormItem>
               )}
             />
+
             {error && (
-              <div className="bg-destructive/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-destructive">
-                <p>{error}</p>
+              <div className="bg-red-500/20 border border-red-500/30 backdrop-blur-sm p-4 rounded-lg flex items-start gap-3 animate-in slide-in-from-top-2 duration-300">
+                <svg
+                  className="w-5 h-5 text-red-300 mt-0.5 shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p className="text-sm text-red-200">{error}</p>
               </div>
             )}
+
             {success && (
-              <div className="bg-emerald-500/15 p-3 rounded-md flex items-center gap-x-2 text-sm text-emerald-500">
-                <p>{success}</p>
+              <div className="bg-green-500/20 border border-green-500/30 backdrop-blur-sm p-4 rounded-lg flex items-start gap-3 animate-in slide-in-from-top-2 duration-300">
+                <svg
+                  className="w-5 h-5 text-green-300 mt-0.5 shrink-0"
+                  fill="currentColor"
+                  viewBox="0 0 20 20"
+                >
+                  <path
+                    fillRule="evenodd"
+                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
+                    clipRule="evenodd"
+                  />
+                </svg>
+                <p className="text-sm text-green-200">{success}</p>
               </div>
             )}
+
             <Button
               disabled={isPending}
               type="submit"
-              className="w-full bg-[#1E40AF]"
+              className="w-full h-11 bg-linear-to-r from-[#1E40AF] to-[#3B82F6] hover:from-[#1E40AF]/90 hover:to-[#3B82F6]/90 text-white font-medium rounded-lg transition-all duration-200 hover:shadow-lg hover:shadow-[#1E40AF]/50 hover:scale-[1.02] active:scale-[0.98]"
             >
-              Send reset email
+              {isPending ? (
+                <div className="flex items-center gap-2">
+                  <svg
+                    className="animate-spin h-5 w-5 text-white"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
+                    ></path>
+                  </svg>
+                  <span>Sending...</span>
+                </div>
+              ) : (
+                "Send Reset Email"
+              )}
             </Button>
           </form>
         </Form>
-      </CardContent>
-      <CardFooter>
-        <Button variant="link" className="w-full font-normal" asChild>
-          <Link href="/auth/login">Back to login</Link>
+
+        <div className="pt-6 mt-6 border-t border-white/10">
+          <Link
+            href="/auth/login"
+            className="flex items-center justify-center gap-2 text-sm text-gray-300 hover:text-white transition-colors group"
+          >
+            <svg
+              className="w-4 h-4 transition-transform group-hover:-translate-x-1"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M10 19l-7-7m0 0l7-7m-7 7h18"
+              />
+            </svg>
+            Back to login
+          </Link>
+        </div>
+      </div>
+
+      <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-xl p-6 text-center space-y-2">
+        <div className="inline-flex items-center justify-center w-12 h-12 rounded-full bg-[#1E40AF]/20 mb-2">
+          <svg
+            className="w-6 h-6 text-[#60A5FA]"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+            />
+          </svg>
+        </div>
+        <h3 className="text-white font-semibold">Need Help?</h3>
+        <p className="text-sm text-gray-400">
+          If you&apos;re having trouble resetting your password, please contact
+          our support team
+        </p>
+        <Button
+          variant="link"
+          className="text-[#60A5FA] hover:text-[#3B82F6] p-0 h-auto"
+          asChild
+        >
+          <Link href="/support">Contact Support</Link>
         </Button>
-      </CardFooter>
-    </Card>
+      </div>
+    </div>
   );
 };
