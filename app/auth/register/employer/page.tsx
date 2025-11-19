@@ -20,7 +20,6 @@ const EmployerRegisterPage = () => {
 
       <div className="hidden lg:flex lg:w-1/2 relative items-center justify-center p-12 z-10">
         <div className="max-w-lg space-y-8">
-          {/* Badge */}
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-[#1E40AF]/20 border border-[#1E40AF]/30 backdrop-blur-sm">
             <svg
               className="w-4 h-4 text-[#60A5FA]"
@@ -49,7 +48,6 @@ const EmployerRegisterPage = () => {
             </p>
           </div>
 
-          {/* Stats */}
           <div className="grid grid-cols-3 gap-6 pt-8">
             <div className="text-center space-y-2">
               <div className="text-3xl font-bold text-white">10K+</div>
@@ -67,7 +65,6 @@ const EmployerRegisterPage = () => {
             </div>
           </div>
 
-          {/* Features */}
           <div className="space-y-4 pt-4">
             <div className="flex items-start gap-3">
               <div className="mt-1 p-1 rounded-lg bg-[#1E40AF]/20">

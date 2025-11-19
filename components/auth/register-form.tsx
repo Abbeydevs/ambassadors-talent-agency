@@ -69,7 +69,6 @@ export const RegisterForm = ({ role }: RegisterFormProps) => {
           </p>
         </div>
 
-        {/* Form */}
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
             <div className="space-y-5">
