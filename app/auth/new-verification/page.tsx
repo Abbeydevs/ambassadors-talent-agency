@@ -1,0 +1,11 @@
+import { NewVerificationForm } from "@/components/auth/new-verification-form";
+
+const NewVerificationPage = () => {
+  return (
+    <div className="h-full flex items-center justify-center bg-[#F9FAFB] py-12">
+      <NewVerificationForm />
+    </div>
+  );
+};
+
+export default NewVerificationPage;
