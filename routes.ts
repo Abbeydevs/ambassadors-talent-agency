@@ -12,3 +12,6 @@ export const authRoutes = [
 export const apiAuthPrefix = "/api/auth";
 
 export const DEFAULT_LOGIN_REDIRECT = "/dashboard";
+export const TALENT_LOGIN_REDIRECT = "/talent/dashboard";
+export const EMPLOYER_LOGIN_REDIRECT = "/employer/dashboard";
+export const ADMIN_LOGIN_REDIRECT = "/admin";
