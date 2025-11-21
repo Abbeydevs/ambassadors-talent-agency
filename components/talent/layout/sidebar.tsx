@@ -63,13 +63,13 @@ export const Sidebar = () => {
         >
           <div className="relative">
             <div className="h-10 w-10 bg-linear-to-br from-[#1E40AF] to-[#3B82F6] rounded-xl flex items-center justify-center shadow-lg group-hover:shadow-xl transition-shadow">
-              <span className="text-white font-bold text-lg">C</span>
+              <span className="text-white font-bold text-lg">A</span>
             </div>
             <div className="absolute -bottom-1 -right-1 h-3 w-3 bg-green-500 rounded-full border-2 border-white"></div>
           </div>
           <div>
             <h1 className="text-xl font-bold text-gray-900 group-hover:text-[#1E40AF] transition-colors">
-              CreativeHub
+              Ambassadors
             </h1>
             <p className="text-xs text-gray-500">Talent Portal</p>
           </div>
