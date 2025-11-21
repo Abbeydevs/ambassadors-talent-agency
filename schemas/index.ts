@@ -1,4 +1,4 @@
-import { AvailabilityStatus, Gender } from "@prisma/client";
+import { AvailabilityStatus, Gender, ProfileVisibility } from "@prisma/client";
 import * as z from "zod";
 
 export const RegisterSchema = z.object({
@@ -138,4 +138,15 @@ const ExperienceItemSchema = z.object({
 
 export const ExperienceListSchema = z.object({
   experience: z.array(ExperienceItemSchema),
+});
+
+export const ProfileSettingsSchema = z.object({
+  profileVisibility: z.nativeEnum(ProfileVisibility),
+
+  contactInfoVisibility: z
+    .object({
+      showEmail: z.boolean(),
+      showPhone: z.boolean(),
+    })
+    .optional(),
 });
