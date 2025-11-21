@@ -142,7 +142,6 @@ export const PortfolioMediaForm = ({
               </FormDescription>
               <MultiFileUpload
                 type="video"
-                accept="video/*"
                 maxFiles={3}
                 value={field.value || []}
                 onChange={field.onChange}
@@ -169,7 +168,6 @@ export const PortfolioMediaForm = ({
               </FormDescription>
               <MultiFileUpload
                 type="audio"
-                accept="audio/*"
                 maxFiles={3}
                 value={field.value || []}
                 onChange={field.onChange}
@@ -199,7 +197,6 @@ export const PortfolioMediaForm = ({
               </FormDescription>
               <MultiFileUpload
                 type="pdf"
-                accept="application/pdf"
                 maxFiles={1}
                 value={field.value ? [{ url: field.value }] : []}
                 onChange={(files) => field.onChange(files[0]?.url || "")}

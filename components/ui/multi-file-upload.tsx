@@ -1,22 +1,33 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useState } from "react";
+import { useState, useCallback, useEffect } from "react";
+import { useDropzone, FileRejection } from "react-dropzone";
+import { X, FileText, FileAudio, UploadCloud, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, FileAudio, X, FileText } from "lucide-react";
-import { getCloudinarySignature } from "@/actions/get-signature";
+import { Progress } from "@/components/ui/progress";
 import { toast } from "sonner";
+import axios from "axios";
+import { getCloudinarySignature } from "@/actions/get-signature";
 
 interface UploadedFile {
   url: string;
   publicId?: string;
 }
 
+interface QueuedFile {
+  file: File;
+  id: string;
+  progress: number;
+  preview?: string;
+  error?: boolean;
+}
+
 interface MultiFileUploadProps {
   value: UploadedFile[];
   onChange: (value: UploadedFile[]) => void;
   onRemove: (url: string) => void;
-  accept?: string;
+  accept?: Record<string, string[]>;
   maxFiles?: number;
   type: "image" | "video" | "audio" | "pdf";
 }
@@ -25,38 +36,39 @@ export const MultiFileUpload = ({
   value = [],
   onChange,
   onRemove,
-  accept = "image/*",
+  accept,
   maxFiles = 5,
   type,
 }: MultiFileUploadProps) => {
-  const [isUploading, setIsUploading] = useState(false);
+  const [queuedFiles, setQueuedFiles] = useState<QueuedFile[]>([]);
 
-  const onUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (!files || files.length === 0) return;
+  const updateProgress = useCallback((id: string, progress: number) => {
+    setQueuedFiles((prev) =>
+      prev.map((item) => (item.id === id ? { ...item, progress } : item))
+    );
+  }, []);
 
-    if (value.length + files.length > maxFiles) {
-      toast.error(`You can only upload ${maxFiles} files.`);
-      return;
-    }
+  const removeQueuedFile = useCallback((id: string) => {
+    setQueuedFiles((prev) => prev.filter((item) => item.id !== id));
+  }, []);
 
-    setIsUploading(true);
-    const newUploads: UploadedFile[] = [];
-    const MAX_SIZE = 10 * 1024 * 1024;
+  const uploadFile = useCallback(
+    async (queuedFile: QueuedFile) => {
+      const MAX_SIZE = 10 * 1024 * 1024;
 
-    try {
-      for (const file of Array.from(files)) {
-        if (file.size > MAX_SIZE) {
-          toast.error(`"${file.name}" is too large. Max size is 10MB.`);
-          continue;
-        }
+      if (queuedFile.file.size > MAX_SIZE) {
+        removeQueuedFile(queuedFile.id);
+        toast.error(`"${queuedFile.file.name}" is too large. Max 10MB.`);
+        return;
+      }
 
+      try {
         const { signature, timestamp } = await getCloudinarySignature(
           "ambassador-talent-media"
         );
 
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", queuedFile.file);
         formData.append(
           "api_key",
           process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY || ""
@@ -68,43 +80,174 @@ export const MultiFileUpload = ({
         const resourceType =
           type === "audio" ? "video" : type === "pdf" ? "image" : type;
 
-        const response = await fetch(
+        const response = await axios.post(
           `https://api.cloudinary.com/v1_1/${process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME}/${resourceType}/upload`,
-          { method: "POST", body: formData }
+          formData,
+          {
+            onUploadProgress: (progressEvent) => {
+              if (progressEvent.total) {
+                const percentCompleted = Math.round(
+                  (progressEvent.loaded * 100) / progressEvent.total
+                );
+                updateProgress(queuedFile.id, percentCompleted);
+              }
+            },
+          }
         );
 
-        const data = await response.json();
-        if (!response.ok) throw new Error(data.error?.message);
+        const data = response.data;
 
-        newUploads.push({ url: data.secure_url, publicId: data.public_id });
+        onChange([
+          ...value,
+          { url: data.secure_url, publicId: data.public_id },
+        ]);
+
+        removeQueuedFile(queuedFile.id);
+        toast.success("Upload complete");
+      } catch (error) {
+        console.error(error);
+        toast.error(`Failed to upload ${queuedFile.file.name}`);
+        removeQueuedFile(queuedFile.id);
+      }
+    },
+    [type, value, onChange, removeQueuedFile, updateProgress]
+  );
+
+  const onDrop = useCallback(
+    async (acceptedFiles: File[], fileRejections: FileRejection[]) => {
+      fileRejections.forEach((rejection) => {
+        toast.error(`${rejection.file.name}: ${rejection.errors[0].message}`);
+      });
+
+      if (value.length + queuedFiles.length + acceptedFiles.length > maxFiles) {
+        toast.error(`You can only upload ${maxFiles} files.`);
+        return;
       }
 
-      onChange([...value, ...newUploads]);
-      toast.success("Upload complete!");
-    } catch (error) {
-      console.error(error);
-      toast.error("Upload failed.");
-    } finally {
-      setIsUploading(false);
-    }
-  };
+      const newQueue = acceptedFiles.map((file) => ({
+        file,
+        id: Math.random().toString(36).substring(7),
+        progress: 0,
+        preview: type === "image" ? URL.createObjectURL(file) : undefined,
+      }));
+
+      setQueuedFiles((prev) => [...prev, ...newQueue]);
+
+      newQueue.forEach((queuedFile) => uploadFile(queuedFile));
+    },
+    [value.length, queuedFiles.length, maxFiles, type, uploadFile]
+  );
+
+  const dropzoneAccept =
+    accept ||
+    (type === "image"
+      ? { "image/*": [] }
+      : type === "video"
+      ? { "video/*": [] }
+      : type === "audio"
+      ? { "audio/*": [] }
+      : type === "pdf"
+      ? { "application/pdf": [] }
+      : undefined);
+
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
+    onDrop,
+    accept: dropzoneAccept,
+    maxFiles,
+    disabled: value.length >= maxFiles,
+  });
+
+  useEffect(() => {
+    return () => {
+      queuedFiles.forEach((file) => {
+        if (file.preview) URL.revokeObjectURL(file.preview);
+      });
+    };
+  }, [queuedFiles]);
 
   return (
     <div className="space-y-4">
+      <div
+        {...getRootProps()}
+        className={`
+          border-2 border-dashed rounded-lg p-8 transition-colors cursor-pointer flex flex-col items-center justify-center text-center gap-2
+          ${
+            isDragActive
+              ? "border-blue-500 bg-blue-50"
+              : "border-gray-300 hover:border-gray-400 hover:bg-slate-50"
+          }
+          ${value.length >= maxFiles ? "opacity-50 cursor-not-allowed" : ""}
+        `}
+      >
+        <input {...getInputProps()} />
+        <div className="p-3 bg-blue-50 rounded-full text-blue-500">
+          <UploadCloud className="h-6 w-6" />
+        </div>
+        <div className="text-sm text-gray-600">
+          {isDragActive ? (
+            <p className="font-semibold text-blue-600">
+              Drop the files here...
+            </p>
+          ) : (
+            <p>
+              <span className="font-semibold text-blue-600">
+                Click to upload
+              </span>{" "}
+              or drag and drop
+            </p>
+          )}
+          <p className="text-xs text-gray-400 mt-1">
+            Supported: {type.toUpperCase()} (Max 10MB)
+          </p>
+        </div>
+      </div>
+
+      {queuedFiles.length > 0 && (
+        <div className="space-y-3">
+          {queuedFiles.map((qFile) => (
+            <div
+              key={qFile.id}
+              className="flex items-center gap-3 p-3 border rounded-md bg-slate-50"
+            >
+              <div className="h-10 w-10 rounded-md overflow-hidden bg-gray-200 flex items-center justify-center shrink-0">
+                {qFile.preview ? (
+                  <img
+                    src={qFile.preview}
+                    alt="Preview"
+                    className="h-full w-full object-cover"
+                  />
+                ) : (
+                  <Loader2 className="h-5 w-5 animate-spin text-gray-500" />
+                )}
+              </div>
+              <div className="flex-1 space-y-1">
+                <div className="flex justify-between text-xs text-gray-600">
+                  <span className="truncate max-w-[150px]">
+                    {qFile.file.name}
+                  </span>
+                  <span>{qFile.progress}%</span>
+                </div>
+                <Progress value={qFile.progress} className="h-2" />
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
       {value.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4">
           {value.map((item) => (
             <div
               key={item.url}
               className="relative aspect-square rounded-md overflow-hidden border bg-slate-100 group"
             >
-              <div className="absolute right-2 top-2 z-10">
+              <div className="absolute right-2 top-2 z-10 opacity-0 group-hover:opacity-100 transition">
                 <Button
                   type="button"
                   onClick={() => onRemove(item.url)}
                   variant="destructive"
                   size="icon"
-                  className="h-6 w-6 opacity-0 group-hover:opacity-100 transition"
+                  className="h-7 w-7"
                 >
                   <X className="h-4 w-4" />
                 </Button>
@@ -144,37 +287,6 @@ export const MultiFileUpload = ({
           ))}
         </div>
       )}
-
-      <div className="flex items-center gap-4">
-        <Button
-          type="button"
-          disabled={isUploading || value.length >= maxFiles}
-          variant="outline"
-          onClick={() => document.getElementById(`upload-${type}`)?.click()}
-          className="w-full border-dashed border-2 h-20 flex flex-col gap-1"
-        >
-          {isUploading ? (
-            "Uploading..."
-          ) : (
-            <>
-              <ImagePlus className="h-5 w-5" />
-              <span>
-                Upload {type === "image" ? "Photos" : type} ({value.length}/
-                {maxFiles})
-              </span>
-            </>
-          )}
-        </Button>
-        <input
-          id={`upload-${type}`}
-          type="file"
-          accept={accept}
-          multiple={maxFiles > 1}
-          className="hidden"
-          onChange={onUpload}
-          disabled={isUploading}
-        />
-      </div>
     </div>
   );
 };
