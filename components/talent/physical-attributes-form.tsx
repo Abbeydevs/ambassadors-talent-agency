@@ -16,6 +16,7 @@ import {
   FormItem,
   FormLabel,
   FormMessage,
+  FormDescription,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -27,7 +28,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { MultiSelect } from "@/components/ui/multi-select";
-import { Loader2 } from "lucide-react";
+import { Loader2, Save, CheckCircle2 } from "lucide-react";
 import { TalentProfile } from "@prisma/client";
 
 type FormValues = z.infer<typeof PhysicalAttributesSchema>;
@@ -86,202 +87,262 @@ export const PhysicalAttributesForm = ({
 
   return (
     <Form {...form}>
-      <form
-        onSubmit={form.handleSubmit(onSubmit)}
-        className="space-y-8 max-w-3xl"
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
+        {/* Physical Measurements Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <div className="h-1 w-1 rounded-full bg-purple-600"></div>
+            <h3 className="font-semibold text-gray-900">
+              Physical Measurements
+            </h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="height"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Height (cm)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      disabled={isPending}
+                      placeholder="e.g. 175"
+                      className="h-11 border-gray-300 focus:border-purple-600 focus:ring-purple-600"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        const val =
+                          e.target.value === ""
+                            ? undefined
+                            : Number(e.target.value);
+                        field.onChange(val);
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Your height in centimeters
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="weight"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Weight (kg)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type="number"
+                      disabled={isPending}
+                      placeholder="e.g. 70"
+                      className="h-11 border-gray-300 focus:border-purple-600 focus:ring-purple-600"
+                      {...field}
+                      value={field.value ?? ""}
+                      onChange={(e) => {
+                        const val =
+                          e.target.value === ""
+                            ? undefined
+                            : Number(e.target.value);
+                        field.onChange(val);
+                      }}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    Your weight in kilograms
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="bodyType"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Body Type</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-11 border-gray-300 focus:border-purple-600 focus:ring-purple-600">
+                        <SelectValue placeholder="Select body type" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="SLIM">Slim</SelectItem>
+                      <SelectItem value="ATHLETIC">Athletic</SelectItem>
+                      <SelectItem value="AVERAGE">Average</SelectItem>
+                      <SelectItem value="CURVY">Curvy</SelectItem>
+                      <SelectItem value="HEAVY">Heavy</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="ethnicity"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Ethnicity</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-11 border-gray-300 focus:border-purple-600 focus:ring-purple-600">
+                        <SelectValue placeholder="Select ethnicity" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="AFRICAN">Black / African</SelectItem>
+                      <SelectItem value="ASIAN">Asian</SelectItem>
+                      <SelectItem value="CAUCASIAN">
+                        White / Caucasian
+                      </SelectItem>
+                      <SelectItem value="HISPANIC">
+                        Hispanic / Latino
+                      </SelectItem>
+                      <SelectItem value="MIXED">Mixed</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        {/* Appearance Details Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <div className="h-1 w-1 rounded-full bg-purple-600"></div>
+            <h3 className="font-semibold text-gray-900">Appearance Details</h3>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <FormField
+              control={form.control}
+              name="eyeColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Eye Color</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-11 border-gray-300 focus:border-purple-600 focus:ring-purple-600">
+                        <SelectValue placeholder="Select eye color" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="BROWN">Brown</SelectItem>
+                      <SelectItem value="BLUE">Blue</SelectItem>
+                      <SelectItem value="GREEN">Green</SelectItem>
+                      <SelectItem value="HAZEL">Hazel</SelectItem>
+                      <SelectItem value="GREY">Grey</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="hairColor"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel className="text-gray-700">Hair Color</FormLabel>
+                  <Select
+                    onValueChange={field.onChange}
+                    defaultValue={field.value || ""}
+                  >
+                    <FormControl>
+                      <SelectTrigger className="h-11 border-gray-300 focus:border-purple-600 focus:ring-purple-600">
+                        <SelectValue placeholder="Select hair color" />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="BLACK">Black</SelectItem>
+                      <SelectItem value="BROWN">Brown</SelectItem>
+                      <SelectItem value="BLONDE">Blonde</SelectItem>
+                      <SelectItem value="RED">Red</SelectItem>
+                      <SelectItem value="GREY">Grey</SelectItem>
+                      <SelectItem value="OTHER">Other</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        </div>
+
+        {/* Languages Section */}
+        <div className="space-y-6">
+          <div className="flex items-center gap-2 pb-2 border-b">
+            <div className="h-1 w-1 rounded-full bg-purple-600"></div>
+            <h3 className="font-semibold text-gray-900">Languages</h3>
+          </div>
+
           <FormField
             control={form.control}
-            name="height"
+            name="languages"
             render={({ field }) => (
               <FormItem>
-                <FormLabel>Height (cm)</FormLabel>
+                <FormLabel className="text-gray-700">
+                  Languages Spoken
+                </FormLabel>
                 <FormControl>
-                  <Input
-                    type="number"
-                    disabled={isPending}
-                    placeholder="175"
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => {
-                      const val =
-                        e.target.value === ""
-                          ? undefined
-                          : Number(e.target.value);
-                      field.onChange(val);
-                    }}
+                  <MultiSelect
+                    selected={field.value || []}
+                    options={LANGUAGE_OPTIONS}
+                    onChange={field.onChange}
+                    placeholder="Select languages..."
                   />
                 </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="weight"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Weight (kg)</FormLabel>
-                <FormControl>
-                  <Input
-                    type="number"
-                    disabled={isPending}
-                    placeholder="70"
-                    {...field}
-                    value={field.value ?? ""}
-                    onChange={(e) => {
-                      const val =
-                        e.target.value === ""
-                          ? undefined
-                          : Number(e.target.value);
-                      field.onChange(val);
-                    }}
-                  />
-                </FormControl>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="bodyType"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Body Type</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select type" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="SLIM">Slim</SelectItem>
-                    <SelectItem value="ATHLETIC">Athletic</SelectItem>
-                    <SelectItem value="AVERAGE">Average</SelectItem>
-                    <SelectItem value="CURVY">Curvy</SelectItem>
-                    <SelectItem value="HEAVY">Heavy</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="ethnicity"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Ethnicity</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select ethnicity" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="AFRICAN">Black / African</SelectItem>
-                    <SelectItem value="ASIAN">Asian</SelectItem>
-                    <SelectItem value="CAUCASIAN">White / Caucasian</SelectItem>
-                    <SelectItem value="HISPANIC">Hispanic / Latino</SelectItem>
-                    <SelectItem value="MIXED">Mixed</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="eyeColor"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Eye Color</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select color" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="BROWN">Brown</SelectItem>
-                    <SelectItem value="BLUE">Blue</SelectItem>
-                    <SelectItem value="GREEN">Green</SelectItem>
-                    <SelectItem value="HAZEL">Hazel</SelectItem>
-                    <SelectItem value="GREY">Grey</SelectItem>
-                  </SelectContent>
-                </Select>
-                <FormMessage />
-              </FormItem>
-            )}
-          />
-
-          <FormField
-            control={form.control}
-            name="hairColor"
-            render={({ field }) => (
-              <FormItem>
-                <FormLabel>Hair Color</FormLabel>
-                <Select
-                  onValueChange={field.onChange}
-                  defaultValue={field.value || ""}
-                >
-                  <FormControl>
-                    <SelectTrigger>
-                      <SelectValue placeholder="Select color" />
-                    </SelectTrigger>
-                  </FormControl>
-                  <SelectContent>
-                    <SelectItem value="BLACK">Black</SelectItem>
-                    <SelectItem value="BROWN">Brown</SelectItem>
-                    <SelectItem value="BLONDE">Blonde</SelectItem>
-                    <SelectItem value="RED">Red</SelectItem>
-                    <SelectItem value="GREY">Grey</SelectItem>
-                    <SelectItem value="OTHER">Other</SelectItem>
-                  </SelectContent>
-                </Select>
+                <FormDescription className="text-xs">
+                  Select all languages you can speak fluently
+                </FormDescription>
                 <FormMessage />
               </FormItem>
             )}
           />
         </div>
 
-        <FormField
-          control={form.control}
-          name="languages"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Languages Spoken</FormLabel>
-              <FormControl>
-                <MultiSelect
-                  selected={field.value || []}
-                  options={LANGUAGE_OPTIONS}
-                  onChange={field.onChange}
-                  placeholder="Select languages..."
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <div className="flex justify-end">
-          <Button type="submit" disabled={isPending} className="bg-[#1E40AF]">
-            {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-            Save Changes
+        {/* Action Buttons */}
+        <div className="flex items-center justify-between pt-6 border-t">
+          <div className="flex items-center gap-2 text-sm text-gray-500">
+            <CheckCircle2 className="h-4 w-4 text-green-500" />
+            <span>Auto-save enabled</span>
+          </div>
+          <Button
+            type="submit"
+            disabled={isPending}
+            className="bg-linear-to-r from-purple-600 to-purple-500 hover:from-purple-700 hover:to-purple-600 h-11 px-8"
+          >
+            {isPending ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Saving...
+              </>
+            ) : (
+              <>
+                <Save className="mr-2 h-4 w-4" />
+                Save Changes
+              </>
+            )}
           </Button>
         </div>
       </form>
