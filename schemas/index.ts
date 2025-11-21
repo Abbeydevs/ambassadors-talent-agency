@@ -124,3 +124,18 @@ export const PortfolioMediaSchema = z.object({
     )
     .optional(),
 });
+
+const ExperienceItemSchema = z.object({
+  projectTitle: z.string().min(1, "Project title is required"),
+  role: z.string().min(1, "Role is required"),
+  year: z.coerce
+    .number()
+    .min(1900, "Invalid year")
+    .max(new Date().getFullYear() + 5, "Year cannot be too far in the future"),
+  productionCompany: z.string().optional(),
+  description: z.string().max(500, "Description is too long").optional(),
+});
+
+export const ExperienceListSchema = z.object({
+  experience: z.array(ExperienceItemSchema),
+});
