@@ -3,7 +3,9 @@
 import { auth } from "@/auth";
 import cloudinary from "@/lib/cloudinary";
 
-export const getCloudinarySignature = async () => {
+export const getCloudinarySignature = async (
+  folder: string = "ambassador-talent-profiles"
+) => {
   const session = await auth();
 
   if (!session) {
@@ -15,7 +17,7 @@ export const getCloudinarySignature = async () => {
   const signature = cloudinary.utils.api_sign_request(
     {
       timestamp: timestamp,
-      folder: "ambassador-talent-profiles",
+      folder: folder,
     },
     process.env.CLOUDINARY_API_SECRET!
   );

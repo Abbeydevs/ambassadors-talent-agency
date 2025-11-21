@@ -80,3 +80,47 @@ export const ProfessionalDetailsSchema = z.object({
     .default(AvailabilityStatus.AVAILABLE),
   willingToTravel: z.boolean().default(false),
 });
+
+export const PortfolioMediaSchema = z.object({
+  photos: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        publicId: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  videos: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        publicId: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  audioSamples: z
+    .array(
+      z.object({
+        url: z.string().url(),
+        publicId: z.string().optional(),
+      })
+    )
+    .optional(),
+
+  resume: z.string().url().optional().or(z.literal("")),
+
+  externalPortfolioLinks: z
+    .array(z.string().url({ message: "Invalid URL" }))
+    .optional(),
+
+  socialMediaLinks: z
+    .array(
+      z.object({
+        platform: z.string(),
+        url: z.string().url(),
+      })
+    )
+    .optional(),
+});
