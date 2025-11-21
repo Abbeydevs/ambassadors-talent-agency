@@ -1,4 +1,4 @@
-import { Gender } from "@prisma/client";
+import { AvailabilityStatus, Gender } from "@prisma/client";
 import * as z from "zod";
 
 export const RegisterSchema = z.object({
@@ -68,4 +68,15 @@ export const PhysicalAttributesSchema = z.object({
   hairColor: z.string().optional(),
   ethnicity: z.string().optional(),
   languages: z.array(z.string()).optional(),
+});
+
+export const ProfessionalDetailsSchema = z.object({
+  talentCategories: z.array(z.string()).min(1, "Select at least one category"),
+  yearsOfExperience: z.coerce.number().min(0).optional(),
+  skills: z.array(z.string()).optional(),
+  unionMemberships: z.array(z.string()).optional(),
+  availabilityStatus: z
+    .nativeEnum(AvailabilityStatus)
+    .default(AvailabilityStatus.AVAILABLE),
+  willingToTravel: z.boolean().default(false),
 });
