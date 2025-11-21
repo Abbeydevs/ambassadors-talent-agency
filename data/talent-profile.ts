@@ -5,6 +5,7 @@ export const getTalentProfileByUserId = async (userId: string) => {
     const profile = await db.talentProfile.findUnique({
       where: { userId },
       include: {
+        user: true,
         photos: true,
         videos: true,
         audioSamples: true,

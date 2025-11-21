@@ -38,19 +38,27 @@ import { CalendarIcon, Loader2 } from "lucide-react";
 import { useTransition } from "react";
 import { toast } from "sonner";
 import { ImageUpload } from "../ui/image-upload";
+import { TalentProfile, User } from "@prisma/client";
 
-export const PersonalInfoForm = () => {
+interface PersonalInfoFormProps {
+  initialData?: (TalentProfile & { user: User }) | null;
+}
+
+export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof PersonalDetailsSchema>>({
     resolver: zodResolver(PersonalDetailsSchema),
     defaultValues: {
-      name: "",
-      stageName: "",
-      bio: "",
-      phone: "",
-      country: "",
-      city: "",
+      name: initialData?.user?.name || "",
+      stageName: initialData?.stageName || "",
+      bio: initialData?.bio || "",
+      phone: initialData?.phone || "",
+      country: initialData?.country || "",
+      city: initialData?.city || "",
+      image: initialData?.user?.image || "",
+      gender: initialData?.gender || undefined,
+      dateOfBirth: initialData?.dateOfBirth || undefined,
     },
     mode: "onChange",
   });

@@ -53,3 +53,19 @@ export const PersonalDetailsSchema = z.object({
     .max(500, { message: "Bio must be less than 500 characters" })
     .optional(),
 });
+
+export const PhysicalAttributesSchema = z.object({
+  height: z.coerce
+    .number()
+    .min(0, "Height must be a positive number")
+    .optional(),
+  weight: z.coerce
+    .number()
+    .min(0, "Weight must be a positive number")
+    .optional(),
+  bodyType: z.string().optional(),
+  eyeColor: z.string().optional(),
+  hairColor: z.string().optional(),
+  ethnicity: z.string().optional(),
+  languages: z.array(z.string()).optional(),
+});
