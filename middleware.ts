@@ -8,6 +8,7 @@ import {
   TALENT_LOGIN_REDIRECT,
   EMPLOYER_LOGIN_REDIRECT,
   ADMIN_LOGIN_REDIRECT,
+  publicRoutePrefixes,
 } from "@/routes";
 
 const { auth } = NextAuth(authConfig);
@@ -18,7 +19,9 @@ export default auth((req) => {
   const role = req.auth?.user?.role;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
-  const isPublicRoute = publicRoutes.includes(nextUrl.pathname);
+  const isPublicRoute =
+    publicRoutes.includes(nextUrl.pathname) ||
+    publicRoutePrefixes.some((prefix) => nextUrl.pathname.startsWith(prefix));
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
