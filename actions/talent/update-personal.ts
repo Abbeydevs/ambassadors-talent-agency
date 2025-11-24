@@ -4,6 +4,7 @@ import * as z from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { PersonalDetailsSchema } from "@/schemas";
+import { updateProfileCompletion } from "@/lib/profile-score";
 
 export const updatePersonalDetails = async (
   values: z.infer<typeof PersonalDetailsSchema>
@@ -66,6 +67,8 @@ export const updatePersonalDetails = async (
         profileCompletion: 20,
       },
     });
+
+    await updateProfileCompletion(userId);
 
     return { success: "Profile updated successfully!" };
   } catch (error) {

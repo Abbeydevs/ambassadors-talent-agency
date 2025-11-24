@@ -4,6 +4,7 @@ import * as z from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { ProfessionalDetailsSchema } from "@/schemas";
+import { updateProfileCompletion } from "@/lib/profile-score";
 
 export const updateProfessionalDetails = async (
   values: z.infer<typeof ProfessionalDetailsSchema>
@@ -40,8 +41,6 @@ export const updateProfessionalDetails = async (
         unionMemberships,
         availabilityStatus,
         willingToTravel,
-        // Update completion score logic
-        // profileCompletion: calculateScore(...)
       },
       create: {
         userId: userId,
@@ -54,6 +53,8 @@ export const updateProfessionalDetails = async (
         profileCompletion: 20,
       },
     });
+
+    await updateProfileCompletion(userId);
 
     return { success: "Professional details updated!" };
   } catch (error) {

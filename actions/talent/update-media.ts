@@ -4,6 +4,7 @@ import * as z from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { PortfolioMediaSchema } from "@/schemas";
+import { updateProfileCompletion } from "@/lib/profile-score";
 
 export const updatePortfolioMedia = async (
   values: z.infer<typeof PortfolioMediaSchema>
@@ -109,6 +110,8 @@ export const updatePortfolioMedia = async (
         },
       });
     });
+
+    await updateProfileCompletion(userId);
 
     return { success: "Media updated successfully!" };
   } catch (error) {

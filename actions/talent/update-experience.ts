@@ -4,6 +4,7 @@ import * as z from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { ExperienceListSchema } from "@/schemas";
+import { updateProfileCompletion } from "@/lib/profile-score";
 
 export const updateExperience = async (
   values: z.infer<typeof ExperienceListSchema>
@@ -48,6 +49,8 @@ export const updateExperience = async (
         });
       }
     });
+
+    await updateProfileCompletion(userId);
 
     return { success: "Experience updated successfully!" };
   } catch (error) {

@@ -52,6 +52,8 @@ export const {
       token.role = existingUser.role;
       token.companyName = existingUser.companyName;
 
+      token.picture = existingUser.image;
+
       return token;
     },
     async session({ token, session }) {

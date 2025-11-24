@@ -4,6 +4,7 @@ import * as z from "zod";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { PhysicalAttributesSchema } from "@/schemas";
+import { updateProfileCompletion } from "@/lib/profile-score";
 
 export const updatePhysicalAttributes = async (
   values: z.infer<typeof PhysicalAttributesSchema>
@@ -54,6 +55,8 @@ export const updatePhysicalAttributes = async (
         languages,
       },
     });
+
+    await updateProfileCompletion(userId);
 
     return { success: "Physical attributes updated!" };
   } catch (error) {
