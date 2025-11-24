@@ -11,6 +11,7 @@ import {
   MessageSquare,
   Settings,
   HelpCircle,
+  ShieldCheck,
 } from "lucide-react";
 
 const sidebarRoutes = [
@@ -41,8 +42,13 @@ const sidebarRoutes = [
   },
   {
     icon: Settings,
-    label: "Profile Settings",
+    label: "Edit Profile",
     href: "/talent/profile/edit/personal",
+  },
+  {
+    icon: ShieldCheck,
+    label: "Account Security",
+    href: "/talent/settings",
   },
   {
     icon: HelpCircle,

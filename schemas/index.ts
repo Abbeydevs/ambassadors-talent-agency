@@ -150,3 +150,36 @@ export const ProfileSettingsSchema = z.object({
     })
     .optional(),
 });
+
+export const SettingsSchema = z
+  .object({
+    name: z.string().min(1, "Name is required").optional(),
+    email: z.string().email("Invalid email").optional(),
+    password: z.string().min(6, "Minimum 6 characters").optional(),
+    newPassword: z.string().min(6, "Minimum 6 characters").optional(),
+    isTwoFactorEnabled: z.boolean().optional(),
+  })
+  .refine(
+    (data) => {
+      if (data.newPassword && !data.password) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "Current password is required to change password",
+      path: ["password"],
+    }
+  )
+  .refine(
+    (data) => {
+      if (data.password && !data.newPassword) {
+        return false;
+      }
+      return true;
+    },
+    {
+      message: "New password is required",
+      path: ["newPassword"],
+    }
+  );

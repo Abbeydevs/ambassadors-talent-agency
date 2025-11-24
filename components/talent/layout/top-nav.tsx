@@ -67,10 +67,6 @@ export const TopNav = () => {
 
         <div className="flex items-center gap-3">
           <UserButton />
-          <div className="hidden lg:block">
-            <p className="text-sm font-semibold text-gray-900">John Doe</p>
-            <p className="text-xs text-gray-500">Talent</p>
-          </div>
         </div>
       </div>
     </div>
