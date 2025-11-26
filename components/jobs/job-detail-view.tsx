@@ -18,8 +18,21 @@ import {
   Bookmark,
   Building2,
   Globe,
+  Linkedin,
+  Check,
+  Copy,
+  Twitter,
+  Facebook,
 } from "lucide-react";
 import { format } from "date-fns";
+import { useState } from "react";
+import { toast } from "sonner";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "../ui/dropdown-menu";
 
 type FullJob = Job & {
   employer: EmployerProfile & {
@@ -32,7 +45,42 @@ interface JobDetailViewProps {
   isTalent?: boolean;
 }
 
-export const JobDetailView = ({ job }: JobDetailViewProps) => {
+export const JobDetailView = ({ job, isTalent }: JobDetailViewProps) => {
+  const [copied, setCopied] = useState(false);
+  const jobUrl = `${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job.id}`;
+
+  const onCopy = () => {
+    navigator.clipboard.writeText(jobUrl);
+    setCopied(true);
+    toast.success("Link copied to clipboard!");
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const onShare = (platform: "twitter" | "linkedin" | "facebook") => {
+    let url = "";
+    const text = `Check out this job: ${job.title} at ${job.employer.user.companyName}`;
+
+    switch (platform) {
+      case "twitter":
+        url = `https://twitter.com/intent/tweet?text=${encodeURIComponent(
+          text
+        )}&url=${encodeURIComponent(jobUrl)}`;
+        break;
+      case "linkedin":
+        url = `https://www.linkedin.com/sharing/share-offsite/?url=${encodeURIComponent(
+          jobUrl
+        )}`;
+        break;
+      case "facebook":
+        url = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(
+          jobUrl
+        )}`;
+        break;
+    }
+
+    window.open(url, "_blank");
+  };
+
   return (
     <div className="min-h-screen bg-slate-50 py-8">
       <div className="max-w-5xl mx-auto px-4 md:px-8">
@@ -68,9 +116,35 @@ export const JobDetailView = ({ job }: JobDetailViewProps) => {
             </div>
 
             <div className="flex gap-3">
-              <Button variant="outline" size="icon">
+              <DropdownMenu>
+                <DropdownMenuTrigger asChild>
+                  <Button variant="outline" size="icon">
+                    <Share2 className="h-4 w-4" />
+                  </Button>
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  <DropdownMenuItem onClick={onCopy}>
+                    {copied ? (
+                      <Check className="mr-2 h-4 w-4" />
+                    ) : (
+                      <Copy className="mr-2 h-4 w-4" />
+                    )}
+                    Copy Link
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onShare("linkedin")}>
+                    <Linkedin className="mr-2 h-4 w-4" /> LinkedIn
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onShare("twitter")}>
+                    <Twitter className="mr-2 h-4 w-4" /> Twitter
+                  </DropdownMenuItem>
+                  <DropdownMenuItem onClick={() => onShare("facebook")}>
+                    <Facebook className="mr-2 h-4 w-4" /> Facebook
+                  </DropdownMenuItem>
+                </DropdownMenuContent>
+              </DropdownMenu>
+              {/* <Button variant="outline" size="icon">
                 <Share2 className="h-4 w-4" />
-              </Button>
+              </Button> */}
               <Button variant="outline" size="icon">
                 <Bookmark className="h-4 w-4" />
               </Button>

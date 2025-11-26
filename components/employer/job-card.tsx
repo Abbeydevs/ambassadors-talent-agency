@@ -102,7 +102,11 @@ export const JobCard = ({ job }: JobCardProps) => {
         </AlertDialogContent>
       </AlertDialog>
 
-      <Card className="hover:shadow-md transition-shadow group">
+      <Card
+        className={`hover:shadow-md transition-shadow group ${
+          job.isFeatured ? "border-amber-200 bg-amber-50/30" : ""
+        }`}
+      >
         <CardContent className="p-6">
           <div className="flex justify-between items-start mb-4">
             <div className="space-y-1">
@@ -110,6 +114,11 @@ export const JobCard = ({ job }: JobCardProps) => {
                 <h3 className="font-bold text-lg text-slate-900 line-clamp-1">
                   {job.title}
                 </h3>
+                {job.isFeatured && (
+                  <Badge className="bg-amber-500 hover:bg-amber-600 border-0">
+                    Featured
+                  </Badge>
+                )}
                 <Badge
                   variant={isPublished ? "default" : "secondary"}
                   className={
