@@ -1,14 +1,13 @@
 import NextAuth from "next-auth";
 import authConfig from "@/auth.config";
 import {
-  DEFAULT_LOGIN_REDIRECT,
   apiAuthPrefix,
   authRoutes,
   publicRoutes,
+  publicRoutePrefixes,
   TALENT_LOGIN_REDIRECT,
   EMPLOYER_LOGIN_REDIRECT,
   ADMIN_LOGIN_REDIRECT,
-  publicRoutePrefixes,
 } from "@/routes";
 
 const { auth } = NextAuth(authConfig);
@@ -19,9 +18,11 @@ export default auth((req) => {
   const role = req.auth?.user?.role;
 
   const isApiAuthRoute = nextUrl.pathname.startsWith(apiAuthPrefix);
+
   const isPublicRoute =
     publicRoutes.includes(nextUrl.pathname) ||
     publicRoutePrefixes.some((prefix) => nextUrl.pathname.startsWith(prefix));
+
   const isAuthRoute = authRoutes.includes(nextUrl.pathname);
 
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
@@ -38,6 +39,7 @@ export default auth((req) => {
         return Response.redirect(new URL(ADMIN_LOGIN_REDIRECT, nextUrl));
       if (role === "EMPLOYER")
         return Response.redirect(new URL(EMPLOYER_LOGIN_REDIRECT, nextUrl));
+
       return Response.redirect(new URL(TALENT_LOGIN_REDIRECT, nextUrl));
     }
     return null;
@@ -56,10 +58,14 @@ export default auth((req) => {
 
   if (isLoggedIn) {
     if (isAdminRoute && role !== "ADMIN") {
-      return Response.redirect(new URL(DEFAULT_LOGIN_REDIRECT, nextUrl));
+      if (role === "EMPLOYER")
+        return Response.redirect(new URL(EMPLOYER_LOGIN_REDIRECT, nextUrl));
+      return Response.redirect(new URL(TALENT_LOGIN_REDIRECT, nextUrl));
     }
 
     if (isEmployerRoute && role !== "EMPLOYER") {
+      if (role === "ADMIN")
+        return Response.redirect(new URL(ADMIN_LOGIN_REDIRECT, nextUrl));
       return Response.redirect(new URL(TALENT_LOGIN_REDIRECT, nextUrl));
     }
 

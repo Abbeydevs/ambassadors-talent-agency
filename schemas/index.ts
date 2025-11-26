@@ -183,3 +183,54 @@ export const SettingsSchema = z
       path: ["newPassword"],
     }
   );
+
+export const CompanyProfileSchema = z.object({
+  companyName: z.string().min(1, "Company name is required"),
+  image: z.string().optional(),
+
+  companyDescription: z
+    .string()
+    .min(10, "Description must be at least 10 characters")
+    .optional(),
+  industryType: z.string().min(1, "Industry is required"),
+  country: z.string().min(1, "Country is required"),
+  city: z.string().min(1, "City is required"),
+
+  websiteUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  companySize: z.coerce.number().optional(),
+  foundedYear: z.coerce
+    .number()
+    .min(1800, "Invalid year")
+    .max(new Date().getFullYear() + 1)
+    .optional(),
+});
+
+export const JobPostSchema = z.object({
+  title: z.string().min(5, "Title must be at least 5 characters"),
+  description: z.string().min(20, "Description is too short"),
+  category: z.string().min(1, "Category is required"),
+  positions: z.coerce.number().min(1).default(1),
+
+  roleDescription: z.string().optional(),
+  skills: z.array(z.string()).optional(),
+  minAge: z.coerce.number().min(0).optional(),
+  maxAge: z.coerce.number().min(0).optional(),
+  gender: z.string().optional(),
+  ethnicity: z.string().optional(),
+
+  location: z.string().min(1, "Location is required"),
+  projectType: z.string().min(1, "Project type is required"),
+  duration: z.string().optional(),
+  startDate: z.date().optional(),
+
+  isPaid: z.boolean().default(true),
+  salaryMin: z.coerce.number().optional(),
+  salaryMax: z.coerce.number().optional(),
+  currency: z.string().default("NGN"),
+  deadline: z.date().optional(),
+  auditionDetails: z.string().optional(),
+
+  attachments: z.array(z.string().url()).optional(),
+  isFeatured: z.boolean().default(false),
+  status: z.enum(["DRAFT", "PUBLISHED"]).default("DRAFT"),
+});

@@ -239,5 +239,51 @@ model EmployerProfile {
   foundedYear         Int?
   contactInfo         Json?
 
-  // TODO: Add relation to Jobs
+  jobs                Job[]
+}
+
+model Job {
+  id              String   @id @default(cuid())
+  employerId      String
+  employer        EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+
+  title           String
+  description     String   @db.Text 
+  category        String   
+  positions       Int      @default(1)
+
+  roleDescription String?  @db.Text
+  skills          String[] 
+  minAge          Int?
+  maxAge          Int?
+  gender          String?  
+  ethnicity       String?  
+
+  location        String   
+  projectType     String   
+  duration        String?  
+  startDate       DateTime?
+
+  isPaid          Boolean  @default(true)
+  salaryMin       Int?
+  salaryMax       Int?
+  currency        String   @default("NGN")
+  deadline        DateTime?
+  auditionDetails String?  @db.Text
+
+  attachments     String[]
+  isFeatured      Boolean  @default(false)
+  status          JobStatus @default(DRAFT)
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([employerId])
+}
+
+enum JobStatus {
+  DRAFT
+  PUBLISHED
+  CLOSED
+  ARCHIVED
 }
