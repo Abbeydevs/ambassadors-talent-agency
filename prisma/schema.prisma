@@ -153,6 +153,7 @@ model TalentProfile {
   audioSamples          PortfolioAudio[]
   documents             PortfolioDocument[]
   experience            ExperienceCredit[]
+  savedJobs             SavedJob[]
 }
 
 model PortfolioPhoto {
@@ -277,8 +278,21 @@ model Job {
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  savedBy         SavedJob[]
 
   @@index([employerId])
+}
+
+model SavedJob {
+  id        String        @id @default(cuid())
+  talentId  String
+  talent    TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  jobId     String
+  job       Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  createdAt DateTime      @default(now())
+
+  @@unique([talentId, jobId]) 
+  @@index([talentId])
 }
 
 enum JobStatus {
