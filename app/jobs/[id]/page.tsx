@@ -5,6 +5,7 @@ import { auth } from "@/auth";
 import { getTalentProfileByUserId } from "@/data/talent-profile";
 import { db } from "@/lib/db";
 import { RelatedJobs } from "@/components/jobs/related-jobs";
+import Link from "next/link";
 
 interface JobPageProps {
   params: Promise<{
@@ -50,21 +51,37 @@ export default async function JobPage({ params }: JobPageProps) {
   const isTalent = session?.user?.role === "TALENT";
 
   return (
-    <div className="pb-10">
-      <JobDetailView
-        job={job}
-        isTalent={isTalent}
-        talentProfile={talentProfile}
-        hasApplied={hasApplied}
-      />
-      ;
-      <div className="max-w-5xl mx-auto px-4 md:px-8">
+    <div className="min-h-screen bg-linear-to-br from-[#F9FAFB] via-white to-[#F9FAFB]">
+      <div className="bg-linear-to-r from-[#1E40AF] via-[#3B82F6] to-[#1E40AF] border-b border-[#1E40AF]/20">
+        <div className="max-w-5xl mx-auto px-4 md:px-8 py-8">
+          <div className="flex items-center gap-3 text-white/90 text-sm mb-4">
+            <Link href="/jobs" className="hover:text-white transition-colors">
+              Jobs
+            </Link>
+            <span>/</span>
+            <span className="text-white font-medium">Job Details</span>
+          </div>
+        </div>
+      </div>
+
+      <div className="max-w-5xl mx-auto px-4 md:px-8 -mt-4">
+        <div className="bg-white rounded-lg shadow-xl border border-[#E5E7EB] overflow-hidden">
+          <JobDetailView
+            job={job}
+            isTalent={isTalent}
+            talentProfile={talentProfile}
+            hasApplied={hasApplied}
+          />
+        </div>
+
         <RelatedJobs
           currentJobId={job.id}
           category={job.category}
           savedJobIds={savedJobIds}
         />
       </div>
+
+      <div className="h-32 bg-linear-to-t from-[#F9FAFB] to-transparent"></div>
     </div>
   );
 }

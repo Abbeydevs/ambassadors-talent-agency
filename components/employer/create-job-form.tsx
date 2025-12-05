@@ -122,7 +122,6 @@ export const CreateJobForm = ({ initialData }: CreateJobFormProps) => {
     const isValid = await form.trigger(fieldsToValidate);
 
     if (isValid) {
-      // Mark current step as completed
       setCompletedSteps((prev) => {
         if (!prev.includes(currentStep)) {
           return [...prev, currentStep];

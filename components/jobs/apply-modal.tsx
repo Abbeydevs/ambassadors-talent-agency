@@ -30,7 +30,13 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Loader2, Send, CheckCircle2, ArrowRight } from "lucide-react";
+import {
+  Loader2,
+  Send,
+  CheckCircle2,
+  ArrowRight,
+  Sparkles,
+} from "lucide-react";
 import { MultiFileUpload } from "@/components/ui/multi-file-upload";
 
 type FullProfile = TalentProfile & { user: User };
@@ -51,7 +57,7 @@ export const ApplyModal = ({
   children,
 }: ApplyModalProps) => {
   const [open, setOpen] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false); // NEW: Track success state
+  const [isSuccess, setIsSuccess] = useState(false);
   const [isPending, startTransition] = useTransition();
 
   const form = useForm<z.infer<typeof ApplicationSchema>>({
@@ -71,7 +77,6 @@ export const ApplyModal = ({
           if (data.error) {
             toast.error(data.error);
           } else {
-            // Instead of closing, we switch to success view
             setIsSuccess(true);
           }
         })
@@ -79,11 +84,9 @@ export const ApplyModal = ({
     });
   };
 
-  // Reset state when modal closes/opens
   const handleOpenChange = (isOpen: boolean) => {
     setOpen(isOpen);
     if (!isOpen) {
-      // Delay reset slightly so user doesn't see flash when closing
       setTimeout(() => {
         setIsSuccess(false);
         form.reset();
@@ -99,32 +102,58 @@ export const ApplyModal = ({
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
         {/* CONDITIONAL RENDERING: Success View vs Form View */}
         {isSuccess ? (
-          <div className="flex flex-col items-center justify-center py-10 text-center space-y-6">
-            <div className="h-20 w-20 bg-green-100 rounded-full flex items-center justify-center">
-              <CheckCircle2 className="h-10 w-10 text-green-600" />
+          <div className="flex flex-col items-center justify-center py-12 text-center space-y-6">
+            <div className="relative">
+              <div className="absolute inset-0 bg-[#10B981]/20 rounded-full animate-ping"></div>
+              <div className="relative h-24 w-24 bg-linear-to-br from-[#10B981] to-[#059669] rounded-full flex items-center justify-center shadow-xl shadow-[#10B981]/30">
+                <CheckCircle2 className="h-12 w-12 text-white" />
+              </div>
             </div>
-            <div className="space-y-2">
-              <h2 className="text-2xl font-bold text-slate-900">
-                Application Sent!
+
+            <div className="space-y-3 max-w-md">
+              <h2 className="text-3xl font-bold text-[#111827]">
+                Application Sent! 🎉
               </h2>
-              <p className="text-slate-500 max-w-sm mx-auto">
+              <p className="text-[#6B7280] text-base leading-relaxed">
                 Your application for{" "}
-                <span className="font-semibold text-slate-900">{jobTitle}</span>{" "}
-                has been submitted successfully. Good luck!
+                <span className="font-semibold text-[#1E40AF]">{jobTitle}</span>{" "}
+                has been submitted successfully. The employer will review your
+                profile and get back to you soon.
               </p>
             </div>
 
-            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-sm pt-4">
+            <div className="w-full max-w-md p-4 bg-[#F0FDF4] border border-[#10B981]/20 rounded-lg">
+              <div className="flex items-start gap-3">
+                <div className="p-2 bg-[#10B981]/10 rounded-lg">
+                  <Sparkles className="h-5 w-5 text-[#10B981]" />
+                </div>
+                <div className="text-left">
+                  <p className="text-sm font-semibold text-[#065F46] mb-1">
+                    What happens next?
+                  </p>
+                  <p className="text-xs text-[#047857]">
+                    You&apos;ll receive notifications about your application
+                    status. Meanwhile, keep exploring more opportunities!
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col sm:flex-row gap-3 w-full max-w-md pt-2">
               <Button
                 variant="outline"
-                className="flex-1"
+                className="flex-1 border-[#E5E7EB] hover:bg-[#F9FAFB]"
                 onClick={() => setOpen(false)}
               >
                 Close
               </Button>
-              <Button asChild className="flex-1 bg-[#1E40AF]">
+              <Button
+                asChild
+                className="flex-1 bg-[#1E40AF] hover:bg-[#1E40AF]/90 shadow-lg shadow-[#1E40AF]/20"
+              >
                 <Link href="/talent/applications">
-                  View My Applications <ArrowRight className="ml-2 h-4 w-4" />
+                  View Applications
+                  <ArrowRight className="ml-2 h-4 w-4" />
                 </Link>
               </Button>
             </div>
