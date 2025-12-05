@@ -142,7 +142,7 @@ model TalentProfile {
 
   socialMediaLinks      Json?
   externalPortfolioLinks String[]
-
+  applications Application[]
 
   profileVisibility       ProfileVisibility @default(PUBLIC)
   contactInfoVisibility   Json?
@@ -275,6 +275,7 @@ model Job {
   attachments     String[]
   isFeatured      Boolean  @default(false)
   status          JobStatus @default(DRAFT)
+  applications Application[]
 
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -293,6 +294,36 @@ model SavedJob {
 
   @@unique([talentId, jobId]) 
   @@index([talentId])
+}
+
+model Application {
+  id          String            @id @default(cuid())
+  
+  jobId       String
+  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
+  
+  talentId    String
+  talent      TalentProfile     @relation(fields: [talentId], references: [id], onDelete: Cascade)
+
+  coverLetter String?           @db.Text
+  attachments String[]
+  status      ApplicationStatus @default(SUBMITTED)
+  
+  createdAt   DateTime          @default(now())
+  updatedAt   DateTime          @updatedAt
+
+  @@unique([jobId, talentId])
+  @@index([jobId])
+  @@index([talentId])
+}
+
+enum ApplicationStatus {
+  SUBMITTED
+  REVIEWING
+  SHORTLISTED
+  INTERVIEW
+  REJECTED
+  HIRED
 }
 
 enum JobStatus {

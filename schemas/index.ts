@@ -234,3 +234,11 @@ export const JobPostSchema = z.object({
   isFeatured: z.boolean().default(false),
   status: z.enum(["DRAFT", "PUBLISHED"]).default("DRAFT"),
 });
+
+export const ApplicationSchema = z.object({
+  coverLetter: z
+    .string()
+    .max(3000, "Cover letter cannot exceed 3000 characters")
+    .optional(),
+  attachments: z.array(z.string().url()).optional(),
+});

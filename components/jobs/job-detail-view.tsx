@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { Job, EmployerProfile, User } from "@prisma/client";
+import { Job, EmployerProfile, User, TalentProfile } from "@prisma/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
@@ -33,6 +33,8 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "../ui/dropdown-menu";
+import { ApplyModal } from "./apply-modal";
+import Link from "next/link";
 
 type FullJob = Job & {
   employer: EmployerProfile & {
@@ -40,12 +42,21 @@ type FullJob = Job & {
   };
 };
 
+type FullProfile = TalentProfile & { user: User };
+
 interface JobDetailViewProps {
   job: FullJob;
   isTalent?: boolean;
+  talentProfile?: FullProfile | null;
+  hasApplied?: boolean;
 }
 
-export const JobDetailView = ({ job, isTalent }: JobDetailViewProps) => {
+export const JobDetailView = ({
+  job,
+  isTalent,
+  talentProfile,
+  hasApplied = false,
+}: JobDetailViewProps) => {
   const [copied, setCopied] = useState(false);
   const jobUrl = `${process.env.NEXT_PUBLIC_APP_URL}/jobs/${job.id}`;
 
@@ -142,26 +153,35 @@ export const JobDetailView = ({ job, isTalent }: JobDetailViewProps) => {
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
-              {/* <Button variant="outline" size="icon">
-                <Share2 className="h-4 w-4" />
-              </Button> */}
               <Button variant="outline" size="icon">
                 <Bookmark className="h-4 w-4" />
               </Button>
-              <Button
-                size="lg"
-                className="bg-[#1E40AF] hover:bg-[#1E40AF]/90 font-semibold px-8"
-              >
-                Apply Now
-              </Button>
+              {isTalent ? (
+                <ApplyModal
+                  jobId={job.id}
+                  jobTitle={job.title}
+                  profile={talentProfile ?? null}
+                  hasApplied={hasApplied}
+                >
+                  <Button
+                    size="lg"
+                    className="bg-[#1E40AF] hover:bg-[#1E40AF]/90 font-semibold px-8"
+                    disabled={hasApplied}
+                  >
+                    {hasApplied ? "Applied" : "Apply Now"}
+                  </Button>
+                </ApplyModal>
+              ) : (
+                <Button size="lg" className="bg-[#1E40AF]" asChild>
+                  <Link href="/auth/login">Apply Now</Link>
+                </Button>
+              )}
             </div>
           </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-          {/* LEFT COLUMN: Job Content */}
           <div className="lg:col-span-2 space-y-6">
-            {/* Job Overview Cards */}
             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
               <OverviewCard
                 icon={DollarSign}

@@ -117,3 +117,31 @@ export const getAllJobs = async (params: JobFilterParams) => {
     };
   }
 };
+
+export const getRelatedJobs = async (
+  currentJobId: string,
+  category: string
+) => {
+  try {
+    const jobs = await db.job.findMany({
+      where: {
+        category: category,
+        id: { not: currentJobId },
+        status: "PUBLISHED",
+      },
+      take: 3,
+      orderBy: { createdAt: "desc" },
+      include: {
+        employer: {
+          include: {
+            user: true,
+          },
+        },
+      },
+    });
+
+    return jobs;
+  } catch {
+    return [];
+  }
+};
