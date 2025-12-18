@@ -12,6 +12,7 @@ import { TalentFilterSidebar } from "@/components/employer/talent-filter-sidebar
 import { getEmployerProfileByUserId } from "@/data/employer-profile";
 import { db } from "@/lib/db";
 import { SaveTalentButton } from "@/components/employer/save-talent-button";
+import { InviteTalentModal } from "@/components/employer/invite-talent-modal";
 
 interface SearchPageProps {
   searchParams: Promise<{
@@ -37,6 +38,17 @@ export default async function TalentSearchPage({
       select: { talentId: true },
     });
     savedTalentIds = saved.map((s) => s.talentId);
+  }
+
+  let openJobs: { id: string; title: string }[] = [];
+  if (profile) {
+    openJobs = await db.job.findMany({
+      where: {
+        employerId: profile.id,
+        status: "PUBLISHED",
+      },
+      select: { id: true, title: true },
+    });
   }
 
   const params = await searchParams;
@@ -145,7 +157,7 @@ export default async function TalentSearchPage({
 
                     <div className="pt-2 flex gap-2">
                       <Button
-                        className="w-full bg-slate-900 text-white"
+                        className="flex-1 bg-slate-900 text-white"
                         size="sm"
                         asChild
                       >
@@ -153,7 +165,13 @@ export default async function TalentSearchPage({
                           View Profile
                         </Link>
                       </Button>
-                      {/* Future: Add 'Save' or 'Invite' button here */}
+                      <div className="flex-1">
+                        <InviteTalentModal
+                          talentId={talent.id}
+                          talentName={talent.user.name || "Talent"}
+                          jobs={openJobs}
+                        />
+                      </div>
                     </div>
                   </CardContent>
                 </Card>

@@ -48,3 +48,23 @@ export const sendApplicationConfirmationEmail = async (
     html: `<p>Your application for <strong>${jobTitle}</strong> has been sent successfully.</p>`,
   });
 };
+
+export const sendJobInvitationEmail = async (
+  email: string,
+  talentName: string,
+  employerName: string,
+  jobTitle: string,
+  jobLink: string
+) => {
+  await resend.emails.send({
+    from: "notifications@thesoftwarehub.tech",
+    to: email,
+    subject: `${employerName} invited you to apply!`,
+    html: `
+      <p>Hi <strong>${talentName}</strong>,</p>
+      <p><strong>${employerName}</strong> thinks you'd be a great fit for their open role: <strong>${jobTitle}</strong>.</p>
+      <p>Click the link below to view the job and apply:</p>
+      <p><a href="${jobLink}">View Job Details</a></p>
+    `,
+  });
+};
