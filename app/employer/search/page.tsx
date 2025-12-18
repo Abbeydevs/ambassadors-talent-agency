@@ -9,6 +9,9 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { TalentFilterSidebar } from "@/components/employer/talent-filter-sidebar";
+import { getEmployerProfileByUserId } from "@/data/employer-profile";
+import { db } from "@/lib/db";
+import { SaveTalentButton } from "@/components/employer/save-talent-button";
 
 interface SearchPageProps {
   searchParams: Promise<{
@@ -22,7 +25,19 @@ export default async function TalentSearchPage({
   searchParams,
 }: SearchPageProps) {
   const session = await auth();
-  if (session?.user?.role !== "EMPLOYER") return redirect("/");
+  if (session?.user?.role !== "EMPLOYER" || !session?.user?.id)
+    return redirect("/");
+
+  const profile = await getEmployerProfileByUserId(session.user.id);
+
+  let savedTalentIds: string[] = [];
+  if (profile) {
+    const saved = await db.savedTalent.findMany({
+      where: { employerId: profile.id },
+      select: { talentId: true },
+    });
+    savedTalentIds = saved.map((s) => s.talentId);
+  }
 
   const params = await searchParams;
   const query = params.q || "";
@@ -80,9 +95,15 @@ export default async function TalentSearchPage({
               talents.map((talent) => (
                 <Card
                   key={talent.id}
-                  className="overflow-hidden hover:shadow-md transition-all"
+                  className="overflow-hidden hover:shadow-md transition-all relative"
                 >
                   <CardHeader className="flex flex-row items-center gap-4 pb-2">
+                    <div className="absolute top-3 right-3 z-10">
+                      <SaveTalentButton
+                        talentId={talent.id}
+                        initialIsSaved={savedTalentIds.includes(talent.id)}
+                      />
+                    </div>
                     <Avatar className="h-14 w-14 border">
                       <AvatarImage src={talent.user.image || ""} />
                       <AvatarFallback className="bg-slate-100 text-slate-600">

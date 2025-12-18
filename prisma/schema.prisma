@@ -149,6 +149,8 @@ model TalentProfile {
   savedJobs             SavedJob[]
   createdAt   DateTime  @default(now())
   updatedAt   DateTime  @default(now()) @updatedAt
+
+  savedBy SavedTalent[]
 }
 
 model PortfolioPhoto {
@@ -236,6 +238,8 @@ model EmployerProfile {
   contactInfo         Json?
 
   jobs                Job[]
+
+  savedTalents SavedTalent[]
 }
 
 model Job {
@@ -311,6 +315,21 @@ model Application {
   @@unique([jobId, talentId])
   @@index([jobId])
   @@index([talentId])
+}
+
+model SavedTalent {
+  id        String   @id @default(cuid())
+  
+  employerId String
+  employer   EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  
+  talentId   String
+  talent     TalentProfile   @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  
+  createdAt  DateTime @default(now())
+
+  @@unique([employerId, talentId])
+  @@index([employerId])
 }
 
 enum ApplicationStatus {
