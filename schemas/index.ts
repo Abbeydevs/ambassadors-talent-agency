@@ -38,6 +38,10 @@ export const NewPasswordSchema = z.object({
 export const PersonalDetailsSchema = z.object({
   name: z.string().min(1, { message: "Full name is required" }),
   stageName: z.string().optional(),
+  headline: z
+    .string()
+    .max(100, "Headline must be 100 characters or less")
+    .optional(),
 
   image: z.string().optional(),
 

@@ -52,6 +52,7 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
     defaultValues: {
       name: initialData?.user?.name || "",
       stageName: initialData?.stageName || "",
+      headline: initialData?.headline || "",
       bio: initialData?.bio || "",
       phone: initialData?.phone || "",
       country: initialData?.country || "",
@@ -156,6 +157,30 @@ export const PersonalInfoForm = ({ initialData }: PersonalInfoFormProps) => {
                   </FormControl>
                   <FormDescription className="text-xs">
                     How you want to be known professionally
+                  </FormDescription>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name="headline"
+              render={({ field }) => (
+                <FormItem className="col-span-1 md:col-span-2">
+                  <FormLabel className="text-gray-700">
+                    Professional Headline
+                  </FormLabel>
+                  <FormControl>
+                    <Input
+                      disabled={isPending}
+                      placeholder="e.g. Senior Software Engineer | Voiceover Artist"
+                      className="h-11 border-gray-300 focus:border-[#1E40AF] focus:ring-[#1E40AF]"
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormDescription className="text-xs">
+                    This is the main title employers will see in search results.
                   </FormDescription>
                   <FormMessage />
                 </FormItem>

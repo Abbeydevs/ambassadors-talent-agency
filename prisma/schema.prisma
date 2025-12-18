@@ -9,9 +9,6 @@ datasource db {
   relationMode = "prisma" 
 }
 
-// ===================================
-// ENUMS (Based on PRD)
-// ===================================
 
 enum Role {
   TALENT
@@ -37,9 +34,6 @@ enum ProfileVisibility {
   PRIVATE
 }
 
-// ===================================
-// AUTHENTICATION MODELS (NextAuth.js)
-// ===================================
 
 model Account {
   id                String  @id @default(cuid())
@@ -108,9 +102,6 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
-// ===================================
-// APPLICATION MODELS
-// ===================================
 
 model TalentProfile {
   id                String  @id @default(cuid())
@@ -139,6 +130,8 @@ model TalentProfile {
   unionMemberships  String[]
   availabilityStatus AvailabilityStatus @default(AVAILABLE)
   willingToTravel   Boolean  @default(false)
+  headline    String?
+  isPublic    Boolean   @default(true)
 
   socialMediaLinks      Json?
   externalPortfolioLinks String[]
@@ -154,6 +147,8 @@ model TalentProfile {
   documents             PortfolioDocument[]
   experience            ExperienceCredit[]
   savedJobs             SavedJob[]
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @default(now()) @updatedAt
 }
 
 model PortfolioPhoto {

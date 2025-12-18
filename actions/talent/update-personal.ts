@@ -27,6 +27,7 @@ export const updatePersonalDetails = async (
       name,
       image,
       stageName,
+      headline,
       dateOfBirth,
       gender,
       country,
@@ -47,6 +48,7 @@ export const updatePersonalDetails = async (
       where: { userId: userId },
       update: {
         stageName,
+        headline,
         dateOfBirth,
         gender,
         country,
@@ -58,6 +60,7 @@ export const updatePersonalDetails = async (
       create: {
         userId: userId,
         stageName,
+        headline,
         dateOfBirth,
         gender,
         country,
