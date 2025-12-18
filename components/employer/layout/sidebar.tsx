@@ -12,6 +12,7 @@ import {
   MessageSquare,
   Building2,
   Settings,
+  Heart,
 } from "lucide-react";
 
 const sidebarRoutes = [
@@ -36,6 +37,11 @@ const sidebarRoutes = [
     href: "/employer/applications",
   },
   {
+    label: "Saved & Shortlists",
+    href: "/employer/saved",
+    icon: Heart,
+  },
+  {
     icon: Search,
     label: "Search Talent",
     href: "/employer/search",
@@ -48,7 +54,7 @@ const sidebarRoutes = [
   {
     icon: Building2,
     label: "Company Profile",
-    href: "/employer/settings", // We just built this!
+    href: "/employer/settings",
   },
 ];
 

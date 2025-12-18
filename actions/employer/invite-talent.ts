@@ -8,6 +8,7 @@ import { sendJobInvitationEmail } from "@/lib/mail";
 export const inviteTalentToJob = async (
   talentId: string,
   jobId: string,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   message: string
 ) => {
   try {

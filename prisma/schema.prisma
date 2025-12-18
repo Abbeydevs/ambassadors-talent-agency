@@ -1,4 +1,3 @@
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -6,9 +5,8 @@ generator client {
 datasource db {
   provider     = "postgresql"
   url          = env("DATABASE_URL")
-  relationMode = "prisma" 
+  relationMode = "prisma"
 }
-
 
 enum Role {
   TALENT
@@ -33,7 +31,6 @@ enum ProfileVisibility {
   PUBLIC
   PRIVATE
 }
-
 
 model Account {
   id                String  @id @default(cuid())
@@ -74,21 +71,21 @@ model VerificationToken {
 }
 
 model User {
-  id              String    @id @default(cuid())
-  name            String? 
-  companyName     String? 
-  email           String    @unique
-  emailVerified   DateTime?
-  hashedPassword  String? 
-  image           String? 
-  role            Role      @default(TALENT)
-  createdAt       DateTime  @default(now())
-  updatedAt       DateTime  @updatedAt
+  id             String    @id @default(cuid())
+  name           String?
+  companyName    String?
+  email          String    @unique
+  emailVerified  DateTime?
+  hashedPassword String?
+  image          String?
+  role           Role      @default(TALENT)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
 
-  accounts        Account[]
-  sessions        Session[]
+  accounts Account[]
+  sessions Session[]
 
-  talentProfile   TalentProfile?
+  talentProfile TalentProfile?
 
   employerProfile EmployerProfile?
 }
@@ -102,63 +99,63 @@ model PasswordResetToken {
   @@unique([email, token])
 }
 
-
 model TalentProfile {
-  id                String  @id @default(cuid())
-  userId            String  @unique
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  stageName         String?   @db.VarChar(255)
-  dateOfBirth       DateTime?
-  gender            Gender?
-  country           String?
-  city              String?
-  phone             String?   @unique
-  bio               String?   @db.Text
+  stageName   String?   @db.VarChar(255)
+  dateOfBirth DateTime?
+  gender      Gender?
+  country     String?
+  city        String?
+  phone       String?   @unique
+  bio         String?   @db.Text
 
-  height            Float?
-  weight            Float?
-  bodyType          String?
-  eyeColor          String?
-  hairColor         String?
-  ethnicity         String?
-  languages         String[]
+  height    Float?
+  weight    Float?
+  bodyType  String?
+  eyeColor  String?
+  hairColor String?
+  ethnicity String?
+  languages String[]
 
-  talentCategories  String[]
-  yearsOfExperience Int?
-  skills            String[]
-  unionMemberships  String[]
+  talentCategories   String[]
+  yearsOfExperience  Int?
+  skills             String[]
+  unionMemberships   String[]
   availabilityStatus AvailabilityStatus @default(AVAILABLE)
-  willingToTravel   Boolean  @default(false)
-  headline    String?
-  isPublic    Boolean   @default(true)
+  willingToTravel    Boolean            @default(false)
+  headline           String?
+  isPublic           Boolean            @default(true)
 
-  socialMediaLinks      Json?
+  socialMediaLinks       Json?
   externalPortfolioLinks String[]
-  applications Application[]
+  applications           Application[]
 
-  profileVisibility       ProfileVisibility @default(PUBLIC)
-  contactInfoVisibility   Json?
-  profileCompletion       Int       @default(0)
+  profileVisibility     ProfileVisibility @default(PUBLIC)
+  contactInfoVisibility Json?
+  profileCompletion     Int               @default(0)
 
-  photos                PortfolioPhoto[]
-  videos                PortfolioVideo[]
-  audioSamples          PortfolioAudio[]
-  documents             PortfolioDocument[]
-  experience            ExperienceCredit[]
-  savedJobs             SavedJob[]
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @default(now()) @updatedAt
+  photos       PortfolioPhoto[]
+  videos       PortfolioVideo[]
+  audioSamples PortfolioAudio[]
+  documents    PortfolioDocument[]
+  experience   ExperienceCredit[]
+  savedJobs    SavedJob[]
+  createdAt    DateTime            @default(now())
+  updatedAt    DateTime            @default(now()) @updatedAt
 
-  savedBy SavedTalent[]
+  savedBy        SavedTalent[]
+  shortlistItems ShortlistItem[]
 }
 
 model PortfolioPhoto {
   id              String        @id @default(cuid())
   talentProfileId String
   talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
-  url             String        
-  publicId        String        
+  url             String
+  publicId        String
   title           String?
   description     String?
   createdAt       DateTime      @default(now())
@@ -170,8 +167,8 @@ model PortfolioVideo {
   id              String        @id @default(cuid())
   talentProfileId String
   talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
-  url             String       
-  publicId        String?     
+  url             String
+  publicId        String?
   title           String?
   description     String?
   createdAt       DateTime      @default(now())
@@ -183,8 +180,8 @@ model PortfolioAudio {
   id              String        @id @default(cuid())
   talentProfileId String
   talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
-  url             String       
-  publicId        String        
+  url             String
+  publicId        String
   title           String?
   description     String?
   createdAt       DateTime      @default(now())
@@ -196,89 +193,88 @@ model PortfolioDocument {
   id              String        @id @default(cuid())
   talentProfileId String
   talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
-  url             String        
-  publicId        String   
+  url             String
+  publicId        String
   fileName        String
   createdAt       DateTime      @default(now())
 
   @@index([talentProfileId])
 }
 
-
 model ExperienceCredit {
-  id                String        @id @default(cuid())
-  talentProfileId   String
-  talentProfile     TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
-  
+  id              String        @id @default(cuid())
+  talentProfileId String
+  talentProfile   TalentProfile @relation(fields: [talentProfileId], references: [id], onDelete: Cascade)
+
   projectTitle      String
   role              String
   year              Int
   productionCompany String?
-  description       String?   @db.Text
-  createdAt         DateTime  @default(now())
+  description       String?  @db.Text
+  createdAt         DateTime @default(now())
 
   @@index([talentProfileId])
 }
 
-
 model EmployerProfile {
-  id                  String   @id @default(cuid())
-  userId              String   @unique
-  user                User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  id     String @id @default(cuid())
+  userId String @unique
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  companyLogoUrl      String?
-  companyDescription  String?  @db.Text
-  industryType        String?
-  country             String?
-  city                String?
-  websiteUrl          String?
-  socialMediaLinks    Json?
-  companySize         Int?
-  foundedYear         Int?
-  contactInfo         Json?
+  companyLogoUrl     String?
+  companyDescription String? @db.Text
+  industryType       String?
+  country            String?
+  city               String?
+  websiteUrl         String?
+  socialMediaLinks   Json?
+  companySize        Int?
+  foundedYear        Int?
+  contactInfo        Json?
 
-  jobs                Job[]
+  jobs Job[]
 
   savedTalents SavedTalent[]
+  shortlists   Shortlist[]
 }
 
 model Job {
-  id              String   @id @default(cuid())
-  employerId      String
-  employer        EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  id         String          @id @default(cuid())
+  employerId String
+  employer   EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
 
-  title           String
-  description     String   @db.Text 
-  category        String   
-  positions       Int      @default(1)
+  title       String
+  description String @db.Text
+  category    String
+  positions   Int    @default(1)
 
   roleDescription String?  @db.Text
-  skills          String[] 
+  skills          String[]
   minAge          Int?
   maxAge          Int?
-  gender          String?  
-  ethnicity       String?  
+  gender          String?
+  ethnicity       String?
 
-  location        String   
-  projectType     String   
-  duration        String?  
-  startDate       DateTime?
+  location    String
+  projectType String
+  duration    String?
+  startDate   DateTime?
 
-  isPaid          Boolean  @default(true)
+  isPaid          Boolean   @default(true)
   salaryMin       Int?
   salaryMax       Int?
-  currency        String   @default("NGN")
+  currency        String    @default("NGN")
   deadline        DateTime?
-  auditionDetails String?  @db.Text
+  auditionDetails String?   @db.Text
 
-  attachments     String[]
-  isFeatured      Boolean  @default(false)
-  status          JobStatus @default(DRAFT)
+  attachments  String[]
+  isFeatured   Boolean       @default(false)
+  status       JobStatus     @default(DRAFT)
   applications Application[]
 
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  savedBy         SavedJob[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+  savedBy   SavedJob[]
 
   @@index([employerId])
 }
@@ -291,26 +287,26 @@ model SavedJob {
   job       Job           @relation(fields: [jobId], references: [id], onDelete: Cascade)
   createdAt DateTime      @default(now())
 
-  @@unique([talentId, jobId]) 
+  @@unique([talentId, jobId])
   @@index([talentId])
 }
 
 model Application {
-  id          String            @id @default(cuid())
-  
-  jobId       String
-  job         Job               @relation(fields: [jobId], references: [id], onDelete: Cascade)
-  
-  talentId    String
-  talent      TalentProfile     @relation(fields: [talentId], references: [id], onDelete: Cascade)
+  id String @id @default(cuid())
+
+  jobId String
+  job   Job    @relation(fields: [jobId], references: [id], onDelete: Cascade)
+
+  talentId String
+  talent   TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
 
   coverLetter String?           @db.Text
   attachments String[]
   status      ApplicationStatus @default(SUBMITTED)
   notes       String?           @db.Text
-  
-  createdAt   DateTime          @default(now())
-  updatedAt   DateTime          @updatedAt
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
   @@unique([jobId, talentId])
   @@index([jobId])
@@ -318,18 +314,44 @@ model Application {
 }
 
 model SavedTalent {
-  id        String   @id @default(cuid())
-  
+  id String @id @default(cuid())
+
   employerId String
   employer   EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
-  
-  talentId   String
-  talent     TalentProfile   @relation(fields: [talentId], references: [id], onDelete: Cascade)
-  
-  createdAt  DateTime @default(now())
+
+  talentId String
+  talent   TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
 
   @@unique([employerId, talentId])
   @@index([employerId])
+}
+
+model Shortlist {
+  id         String          @id @default(cuid())
+  name       String
+  employerId String
+  employer   EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+
+  items ShortlistItem[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model ShortlistItem {
+  id String @id @default(cuid())
+
+  shortlistId String
+  shortlist   Shortlist @relation(fields: [shortlistId], references: [id], onDelete: Cascade)
+
+  talentId String
+  talent   TalentProfile @relation(fields: [talentId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+
+  @@unique([shortlistId, talentId])
 }
 
 enum ApplicationStatus {

@@ -13,6 +13,8 @@ import { getEmployerProfileByUserId } from "@/data/employer-profile";
 import { db } from "@/lib/db";
 import { SaveTalentButton } from "@/components/employer/save-talent-button";
 import { InviteTalentModal } from "@/components/employer/invite-talent-modal";
+import { getEmployerShortlists } from "@/actions/employer/shortlist-actions";
+import { AddToShortlistModal } from "@/components/employer/add-to-shortlist-modal";
 
 interface SearchPageProps {
   searchParams: Promise<{
@@ -50,6 +52,8 @@ export default async function TalentSearchPage({
       select: { id: true, title: true },
     });
   }
+
+  const shortlists = await getEmployerShortlists();
 
   const params = await searchParams;
   const query = params.q || "";
@@ -155,7 +159,7 @@ export default async function TalentSearchPage({
                       )}
                     </div>
 
-                    <div className="pt-2 flex gap-2">
+                    <div className="pt-2 flex gap-2 items-center">
                       <Button
                         className="flex-1 bg-slate-900 text-white"
                         size="sm"
@@ -165,6 +169,7 @@ export default async function TalentSearchPage({
                           View Profile
                         </Link>
                       </Button>
+
                       <div className="flex-1">
                         <InviteTalentModal
                           talentId={talent.id}
@@ -172,6 +177,12 @@ export default async function TalentSearchPage({
                           jobs={openJobs}
                         />
                       </div>
+
+                      <AddToShortlistModal
+                        talentId={talent.id}
+                        talentName={talent.user.name || "Talent"}
+                        existingLists={shortlists}
+                      />
                     </div>
                   </CardContent>
                 </Card>
