@@ -73,3 +73,38 @@ export const saveApplicationNote = async (
     return { error: "Something went wrong" };
   }
 };
+
+export const bulkUpdateApplicationStatus = async (
+  applicationIds: string[],
+  status: ApplicationStatus
+) => {
+  try {
+    const session = await auth();
+
+    if (!session || session.user.role !== "EMPLOYER" || !session.user.id) {
+      return { error: "Unauthorized" };
+    }
+
+    const profile = await getEmployerProfileByUserId(session.user.id);
+    if (!profile) return { error: "Profile not found" };
+
+    const result = await db.application.updateMany({
+      where: {
+        id: { in: applicationIds },
+        job: {
+          employerId: profile.id,
+        },
+      },
+      data: {
+        status,
+      },
+    });
+
+    revalidatePath("/employer/applications");
+
+    return { success: `Updated ${result.count} applications to ${status}` };
+  } catch (error) {
+    console.error(error);
+    return { error: "Something went wrong" };
+  }
+};
