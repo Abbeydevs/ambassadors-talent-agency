@@ -19,8 +19,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
-import { Eye, Loader2 } from "lucide-react";
-import Link from "next/link";
+import { Loader2, ChevronRight, FileText } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { format } from "date-fns";
 import { toast } from "sonner";
 import { bulkUpdateApplicationStatus } from "@/actions/employer/application-actions";
@@ -35,6 +35,7 @@ interface ApplicationsTableProps {
 }
 
 export const ApplicationsTable = ({ applications }: ApplicationsTableProps) => {
+  const router = useRouter();
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [isPending, startTransition] = useTransition();
 
@@ -71,50 +72,76 @@ export const ApplicationsTable = ({ applications }: ApplicationsTableProps) => {
 
   const getStatusColor = (status: string) => {
     switch (status) {
+      case "SUBMITTED":
+        return "bg-[#3B82F6]/10 text-[#3B82F6] border-[#3B82F6]/20";
       case "SHORTLISTED":
-        return "bg-amber-100 text-amber-700 hover:bg-amber-100";
+        return "bg-[#F59E0B]/10 text-[#F59E0B] border-[#F59E0B]/20";
       case "HIRED":
-        return "bg-green-100 text-green-700 hover:bg-green-100";
+        return "bg-[#10B981]/10 text-[#10B981] border-[#10B981]/20";
       case "REJECTED":
-        return "bg-red-100 text-red-700 hover:bg-red-100";
+        return "bg-[#EF4444]/10 text-[#EF4444] border-[#EF4444]/20";
+      case "INTERVIEW":
+        return "bg-[#8B5CF6]/10 text-[#8B5CF6] border-[#8B5CF6]/20";
       default:
-        return "bg-slate-100 text-slate-700 hover:bg-slate-100";
+        return "bg-[#6B7280]/10 text-[#6B7280] border-[#6B7280]/20";
     }
+  };
+
+  const handleRowClick = (
+    app: ApplicationWithRelations,
+    e: React.MouseEvent
+  ) => {
+    const target = e.target as HTMLElement;
+    if (
+      target.closest("button") ||
+      target.closest('[role="checkbox"]') ||
+      target.closest('input[type="checkbox"]')
+    ) {
+      return;
+    }
+    router.push(`/employer/jobs/${app.jobId}/applications`);
   };
 
   return (
     <div className="space-y-4">
       {selectedIds.length > 0 && (
-        <div className="bg-slate-900 text-white p-2 px-4 rounded-lg flex items-center justify-between shadow-lg animate-in slide-in-from-top-2">
-          <span className="text-sm font-medium">
-            {selectedIds.length} candidates selected
+        <div className="bg-[#1F2937] text-white p-4 px-6 rounded-xl flex items-center justify-between shadow-lg animate-in slide-in-from-top-2">
+          <span className="text-sm font-semibold">
+            {selectedIds.length} candidate{selectedIds.length > 1 ? "s" : ""}{" "}
+            selected
           </span>
-          <div className="flex gap-2">
+          <div className="flex gap-3">
             <Button
               size="sm"
               variant="destructive"
               disabled={isPending}
               onClick={() => onBulkAction("REJECTED")}
-              className="h-8 text-xs"
+              className="h-9 bg-[#EF4444] hover:bg-[#DC2626] font-medium"
             >
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
               Reject Selected
             </Button>
             <Button
               size="sm"
-              className="h-8 text-xs bg-green-600 hover:bg-green-700 text-white"
+              className="h-9 bg-[#10B981] hover:bg-[#059669] text-white font-medium"
               disabled={isPending}
               onClick={() => onBulkAction("SHORTLISTED")}
             >
+              {isPending ? (
+                <Loader2 className="h-4 w-4 animate-spin mr-2" />
+              ) : null}
               Shortlist Selected
             </Button>
           </div>
         </div>
       )}
 
-      <div className="rounded-md border bg-white shadow-sm">
+      <div className="rounded-xl border border-[#E5E7EB] bg-white shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
+            <TableRow className="bg-[#F9FAFB] hover:bg-[#F9FAFB]">
               <TableHead className="w-[50px]">
                 <Checkbox
                   checked={
@@ -124,11 +151,19 @@ export const ApplicationsTable = ({ applications }: ApplicationsTableProps) => {
                   onCheckedChange={(checked) => toggleAll(!!checked)}
                 />
               </TableHead>
-              <TableHead>Candidate</TableHead>
-              <TableHead>Applied For</TableHead>
-              <TableHead>Date Applied</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead className="text-right">Action</TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Candidate
+              </TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Applied For
+              </TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Date Applied
+              </TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Status
+              </TableHead>
+              <TableHead className="w-[50px]"></TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -136,9 +171,17 @@ export const ApplicationsTable = ({ applications }: ApplicationsTableProps) => {
               <TableRow>
                 <TableCell
                   colSpan={6}
-                  className="h-32 text-center text-muted-foreground"
+                  className="h-40 text-center text-[#6B7280]"
                 >
-                  No applications found.
+                  <div className="flex flex-col items-center gap-2">
+                    <div className="p-3 bg-[#F9FAFB] rounded-full">
+                      <FileText className="h-8 w-8 text-[#9CA3AF]" />
+                    </div>
+                    <p className="font-medium">No applications found</p>
+                    <p className="text-sm">
+                      Applications will appear here when candidates apply
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
@@ -146,8 +189,10 @@ export const ApplicationsTable = ({ applications }: ApplicationsTableProps) => {
                 <TableRow
                   key={app.id}
                   data-state={selectedIds.includes(app.id) && "selected"}
+                  className="cursor-pointer hover:bg-[#F9FAFB] transition-colors"
+                  onClick={(e) => handleRowClick(app, e)}
                 >
-                  <TableCell>
+                  <TableCell onClick={(e) => e.stopPropagation()}>
                     <Checkbox
                       checked={selectedIds.includes(app.id)}
                       onCheckedChange={(checked) =>
@@ -157,34 +202,38 @@ export const ApplicationsTable = ({ applications }: ApplicationsTableProps) => {
                   </TableCell>
                   <TableCell>
                     <div className="flex items-center gap-3">
-                      <Avatar className="h-8 w-8">
+                      <Avatar className="h-10 w-10 border-2 border-[#E5E7EB]">
                         <AvatarImage src={app.talent.user.image || ""} />
-                        <AvatarFallback>
+                        <AvatarFallback className="bg-[#1E40AF]/10 text-[#1E40AF] font-semibold">
                           {app.talent.user.name?.[0]}
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex flex-col">
-                        <span className="font-medium text-sm">
+                        <span className="font-semibold text-[#111827]">
                           {app.talent.user.name}
                         </span>
-                        <span className="text-xs text-muted-foreground">
+                        <span className="text-sm text-[#6B7280]">
                           {app.talent.user.email}
                         </span>
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell className="font-medium text-[#1E40AF]">
-                    {app.job.title}
+                  <TableCell>
+                    <span className="font-medium text-[#1E40AF]">
+                      {app.job.title}
+                    </span>
                   </TableCell>
                   <TableCell>
-                    {format(new Date(app.createdAt), "MMM d, yyyy")}
+                    <span className="text-[#6B7280] font-medium">
+                      {format(new Date(app.createdAt), "MMM d, yyyy")}
+                    </span>
                   </TableCell>
                   <TableCell>
                     {isPending && selectedIds.includes(app.id) ? (
-                      <Loader2 className="h-4 w-4 animate-spin text-slate-400" />
+                      <Loader2 className="h-4 w-4 animate-spin text-[#6B7280]" />
                     ) : (
                       <Badge
-                        className={`rounded-md font-normal shadow-none ${getStatusColor(
+                        className={`rounded-full font-semibold border ${getStatusColor(
                           app.status
                         )}`}
                       >
@@ -192,12 +241,8 @@ export const ApplicationsTable = ({ applications }: ApplicationsTableProps) => {
                       </Badge>
                     )}
                   </TableCell>
-                  <TableCell className="text-right">
-                    <Button variant="ghost" size="sm" asChild>
-                      <Link href={`/employer/jobs/${app.jobId}/applications`}>
-                        <Eye className="h-4 w-4 mr-2" /> View
-                      </Link>
-                    </Button>
+                  <TableCell>
+                    <ChevronRight className="h-5 w-5 text-[#9CA3AF]" />
                   </TableCell>
                 </TableRow>
               ))
