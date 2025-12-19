@@ -1,25 +1,21 @@
-import { UserButton } from "@/components/auth/user-button";
+import { auth } from "@/auth";
+import { redirect } from "next/navigation";
+import { getAdminAnalytics } from "@/actions/admin/analytics";
+import { AnalyticsDashboard } from "@/components/admin/analytics-dashboard";
 
-const AdminDashboard = async () => {
+export default async function AdminDashboardPage() {
+  const session = await auth();
+  if (session?.user?.role !== "ADMIN") return redirect("/");
+
+  const analyticsData = await getAdminAnalytics();
+
+  if (!analyticsData) {
+    return <div>Failed to load data</div>;
+  }
+
   return (
-    <div className="p-10 bg-slate-50 min-h-screen">
-      <div className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-          Admin Panel
-        </h1>
-        <div className="flex items-center gap-4">
-          <span className="px-3 py-1 rounded-full bg-rose-100 text-rose-600 text-xs font-bold">
-            ADMIN
-          </span>
-          <UserButton />
-        </div>
-      </div>
-      <div className="p-6 bg-white rounded-lg border shadow-sm">
-        <h2 className="text-lg font-semibold mb-4">System Overview</h2>
-        <p>Welcome to the secure admin area.</p>
-      </div>
+    <div>
+      <AnalyticsDashboard data={analyticsData} />
     </div>
   );
-};
-
-export default AdminDashboard;
+}
