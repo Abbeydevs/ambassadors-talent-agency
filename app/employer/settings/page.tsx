@@ -3,6 +3,7 @@ import { getEmployerProfileByUserId } from "@/data/employer-profile";
 import { CompanyProfileForm } from "@/components/employer/company-profile-form";
 import { redirect } from "next/navigation";
 import { Building2, Globe, Users } from "lucide-react";
+import { VerificationBadge } from "@/components/ui/verification-badge";
 
 export default async function EmployerSettingsPage() {
   const session = await auth();
@@ -24,6 +25,11 @@ export default async function EmployerSettingsPage() {
               <Building2 className="h-6 w-6 text-white" />
             </div>
             <h1 className="text-3xl font-bold text-white">Company Profile</h1>
+            {profile?.isVerified && (
+              <div className="bg-white rounded-full p-0.5 shadow-sm">
+                <VerificationBadge />
+              </div>
+            )}
           </div>
           <p className="text-white/80 text-sm max-w-2xl">
             Manage your company details and branding. A complete profile helps

@@ -13,8 +13,13 @@ import {
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
 import { logout } from "@/actions/logout";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { VerificationBadge } from "../ui/verification-badge";
 
-export const UserButton = () => {
+interface UserButtonProps {
+  isVerified?: boolean;
+}
+
+export const UserButton = ({ isVerified = false }: UserButtonProps) => {
   const user = useCurrentUser();
 
   return (
@@ -36,7 +41,12 @@ export const UserButton = () => {
         <div className="flex items-center justify-start gap-2 p-2">
           <div className="flex flex-col space-y-1 leading-none">
             {user?.name && (
-              <p className="font-medium text-sm text-slate-900">{user.name}</p>
+              <div className="flex items-center gap-1.5">
+                <p className="font-medium text-sm text-slate-900">
+                  {user.name}
+                </p>
+                {isVerified && <VerificationBadge />}
+              </div>
             )}
             {user?.email && (
               <p className="w-[200px] truncate text-xs text-muted-foreground">

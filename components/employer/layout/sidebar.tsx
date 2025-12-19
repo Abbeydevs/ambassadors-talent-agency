@@ -13,6 +13,7 @@ import {
   Building2,
   Settings,
   Heart,
+  ShieldCheck,
 } from "lucide-react";
 
 const sidebarRoutes = [
@@ -45,6 +46,11 @@ const sidebarRoutes = [
     icon: Search,
     label: "Search Talent",
     href: "/employer/search",
+  },
+  {
+    label: "Verification",
+    href: "/employer/verification",
+    icon: ShieldCheck,
   },
   {
     icon: MessageSquare,

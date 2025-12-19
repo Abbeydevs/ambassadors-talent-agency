@@ -6,7 +6,11 @@ import { Button } from "@/components/ui/button";
 import { Bell, MessageSquare, Search, Menu } from "lucide-react";
 import { useState } from "react";
 
-export const TopNav = () => {
+interface TopNavProps {
+  isVerified?: boolean;
+}
+
+export const TopNav = ({ isVerified = false }: TopNavProps) => {
   const [searchFocused, setSearchFocused] = useState(false);
 
   return (
@@ -66,7 +70,7 @@ export const TopNav = () => {
         <div className="h-8 w-px bg-gray-200 mx-2"></div>
 
         <div className="flex items-center gap-3">
-          <UserButton />
+          <UserButton isVerified={isVerified} />
         </div>
       </div>
     </div>

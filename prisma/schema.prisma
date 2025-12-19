@@ -231,6 +231,8 @@ model EmployerProfile {
   companySize        Int?
   foundedYear        Int?
   contactInfo        Json?
+  isVerified     Boolean @default(false)
+  verificationRequests VerificationRequest[]
 
   jobs Job[]
 
@@ -353,6 +355,30 @@ model ShortlistItem {
   createdAt DateTime @default(now())
 
   @@unique([shortlistId, talentId])
+}
+
+model VerificationRequest {
+  id          String   @id @default(cuid())
+  
+  employerId  String
+  employer    EmployerProfile @relation(fields: [employerId], references: [id], onDelete: Cascade)
+  
+  documentUrl String  
+  documentType String? 
+  status      VerificationStatus @default(PENDING)
+  
+  rejectionReason String?
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@index([employerId])
+}
+
+enum VerificationStatus {
+  PENDING
+  APPROVED
+  REJECTED
 }
 
 enum ApplicationStatus {
