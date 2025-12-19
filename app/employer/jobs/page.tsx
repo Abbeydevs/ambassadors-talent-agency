@@ -6,7 +6,6 @@ import { Badge } from "@/components/ui/badge";
 import {
   PlusCircle,
   Briefcase,
-  Search,
   Filter,
   FileText,
   Eye,
@@ -144,114 +143,148 @@ export default async function EmployerJobsPage({
       </div>
 
       {/* Search and Filter Section */}
-      <div className="bg-white border border-[#E5E7EB] rounded-lg p-6 shadow-sm">
-        <div className="flex flex-col lg:flex-row gap-4 items-start lg:items-center">
-          {/* Search */}
-          <div className="flex-1 w-full">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-[#6B7280]" />
-              <div className="pl-10">
-                <JobsSearchInput />
-              </div>
+      <div className="bg-white border border-[#E5E7EB] rounded-xl p-6 shadow-sm">
+        {/* Search Input */}
+        <div className="mb-5">
+          <div className="relative">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 pointer-events-none"></div>
+            <div>
+              <JobsSearchInput />
             </div>
           </div>
+        </div>
 
-          {/* Filter Buttons */}
-          <div className="flex items-center gap-2 w-full lg:w-auto">
-            <div className="flex items-center gap-2 text-sm text-[#6B7280] mr-2">
-              <Filter className="h-4 w-4" />
-              <span className="hidden sm:inline font-medium">Filter:</span>
-            </div>
+        {/* Filter Buttons */}
+        <div className="space-y-3">
+          <div className="flex items-center gap-2 text-sm font-medium text-[#6B7280]">
+            <Filter className="h-4 w-4" />
+            <span>Filter by Status</span>
+          </div>
+
+          <div className="flex flex-wrap gap-2">
             <Button
               variant={!status ? "default" : "outline"}
               size="sm"
               asChild
-              className={
+              className={`rounded-full transition-all ${
                 !status
-                  ? "bg-[#1E40AF] hover:bg-[#1E40AF]/90"
-                  : "border-[#E5E7EB] hover:bg-[#F9FAFB]"
-              }
+                  ? "bg-[#1E40AF] hover:bg-[#1E3A8A] text-white shadow-sm"
+                  : "border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] hover:border-[#1E40AF] hover:text-[#1E40AF]"
+              }`}
             >
-              <Link href="/employer/jobs">
-                <FileText className="h-4 w-4 mr-1" />
-                All
-                {!status && (
-                  <Badge className="ml-2 bg-white text-[#1E40AF] hover:bg-white">
-                    {jobs.length}
-                  </Badge>
-                )}
+              <Link href="/employer/jobs" className="flex items-center gap-2">
+                <FileText className="h-4 w-4" />
+                <span>All Jobs</span>
+                <Badge
+                  className={`ml-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    !status
+                      ? "bg-white/20 text-white hover:bg-white/20"
+                      : "bg-[#F9FAFB] text-[#6B7280]"
+                  }`}
+                >
+                  {jobs.length}
+                </Badge>
               </Link>
             </Button>
+
             <Button
               variant={status === "PUBLISHED" ? "default" : "outline"}
               size="sm"
               asChild
-              className={
+              className={`rounded-full transition-all ${
                 status === "PUBLISHED"
-                  ? "bg-[#10B981] hover:bg-[#10B981]/90"
-                  : "border-[#E5E7EB] hover:bg-[#F9FAFB]"
-              }
+                  ? "bg-[#10B981] hover:bg-[#059669] text-white shadow-sm"
+                  : "border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] hover:border-[#10B981] hover:text-[#10B981]"
+              }`}
             >
-              <Link href="/employer/jobs?status=PUBLISHED">
-                <Eye className="h-4 w-4 mr-1" />
-                Active
-                {status === "PUBLISHED" && (
-                  <Badge className="ml-2 bg-white text-[#10B981] hover:bg-white">
-                    {publishedCount}
-                  </Badge>
-                )}
+              <Link
+                href="/employer/jobs?status=PUBLISHED"
+                className="flex items-center gap-2"
+              >
+                <Eye className="h-4 w-4" />
+                <span>Active</span>
+                <Badge
+                  className={`ml-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    status === "PUBLISHED"
+                      ? "bg-white/20 text-white hover:bg-white/20"
+                      : "bg-[#F9FAFB] text-[#6B7280]"
+                  }`}
+                >
+                  {publishedCount}
+                </Badge>
               </Link>
             </Button>
+
             <Button
               variant={status === "DRAFT" ? "default" : "outline"}
               size="sm"
               asChild
-              className={
+              className={`rounded-full transition-all ${
                 status === "DRAFT"
-                  ? "bg-[#F59E0B] hover:bg-[#F59E0B]/90"
-                  : "border-[#E5E7EB] hover:bg-[#F9FAFB]"
-              }
+                  ? "bg-[#F59E0B] hover:bg-[#D97706] text-white shadow-sm"
+                  : "border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] hover:border-[#F59E0B] hover:text-[#F59E0B]"
+              }`}
             >
-              <Link href="/employer/jobs?status=DRAFT">
-                <FolderOpen className="h-4 w-4 mr-1" />
-                Drafts
-                {status === "DRAFT" && (
-                  <Badge className="ml-2 bg-white text-[#F59E0B] hover:bg-white">
-                    {draftCount}
-                  </Badge>
-                )}
+              <Link
+                href="/employer/jobs?status=DRAFT"
+                className="flex items-center gap-2"
+              >
+                <FolderOpen className="h-4 w-4" />
+                <span>Drafts</span>
+                <Badge
+                  className={`ml-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    status === "DRAFT"
+                      ? "bg-white/20 text-white hover:bg-white/20"
+                      : "bg-[#F9FAFB] text-[#6B7280]"
+                  }`}
+                >
+                  {draftCount}
+                </Badge>
               </Link>
             </Button>
+
             <Button
               variant={status === "CLOSED" ? "default" : "outline"}
               size="sm"
               asChild
-              className={
+              className={`rounded-full transition-all ${
                 status === "CLOSED"
-                  ? "bg-[#6B7280] hover:bg-[#6B7280]/90"
-                  : "border-[#E5E7EB] hover:bg-[#F9FAFB]"
-              }
+                  ? "bg-[#6B7280] hover:bg-[#4B5563] text-white shadow-sm"
+                  : "border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB] hover:border-[#6B7280]"
+              }`}
             >
-              <Link href="/employer/jobs?status=CLOSED">
-                <XCircle className="h-4 w-4 mr-1" />
-                Closed
-                {status === "CLOSED" && (
-                  <Badge className="ml-2 bg-white text-[#6B7280] hover:bg-white">
-                    {closedCount}
-                  </Badge>
-                )}
+              <Link
+                href="/employer/jobs?status=CLOSED"
+                className="flex items-center gap-2"
+              >
+                <XCircle className="h-4 w-4" />
+                <span>Closed</span>
+                <Badge
+                  className={`ml-1 rounded-full px-2 py-0.5 text-xs font-semibold ${
+                    status === "CLOSED"
+                      ? "bg-white/20 text-white hover:bg-white/20"
+                      : "bg-[#F9FAFB] text-[#6B7280]"
+                  }`}
+                >
+                  {closedCount}
+                </Badge>
               </Link>
             </Button>
           </div>
         </div>
 
-        {/* Active Filter Indicator */}
+        {/* Active Filters Display */}
         {(q || status) && (
-          <div className="mt-4 pt-4 border-t border-[#E5E7EB]">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2 text-sm text-[#6B7280]">
-                <span>Filtered results:</span>
-                <Badge variant="outline" className="font-normal">
+          <div className="mt-5 pt-5 border-t border-[#E5E7EB]">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-[#6B7280]">
+                  Showing Results:
+                </span>
+                <Badge
+                  variant="outline"
+                  className="bg-[#1E40AF]/5 border-[#1E40AF]/20 text-[#1E40AF] font-semibold rounded-full px-3 py-1"
+                >
                   {jobs.length} {jobs.length === 1 ? "job" : "jobs"} found
                 </Badge>
               </div>
@@ -259,9 +292,15 @@ export default async function EmployerJobsPage({
                 variant="ghost"
                 size="sm"
                 asChild
-                className="text-[#1E40AF] hover:text-[#1E40AF] hover:bg-[#1E40AF]/10"
+                className="text-[#1E40AF] hover:text-[#1E3A8A] hover:bg-[#1E40AF]/10 rounded-full font-medium"
               >
-                <Link href="/employer/jobs">Clear all filters</Link>
+                <Link
+                  href="/employer/jobs"
+                  className="flex items-center gap-1.5"
+                >
+                  <XCircle className="h-4 w-4" />
+                  Clear all filters
+                </Link>
               </Button>
             </div>
           </div>
@@ -308,7 +347,14 @@ export default async function EmployerJobsPage({
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {jobs.map((job) => (
-            <JobCard key={job.id} job={job} />
+            <JobCard
+              key={job.id}
+              job={{
+                ...job,
+                _count: { applications: 0 },
+                views: job.views || 0,
+              }}
+            />
           ))}
         </div>
       )}

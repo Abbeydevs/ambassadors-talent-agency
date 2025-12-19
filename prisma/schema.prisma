@@ -269,6 +269,7 @@ model Job {
 
   attachments  String[]
   isFeatured   Boolean       @default(false)
+  views        Int           @default(0)
   status       JobStatus     @default(DRAFT)
   applications Application[]
 
