@@ -4,7 +4,7 @@ import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { Prisma } from "@prisma/client";
 
-export const getAdminTalents = async (query: string = "") => {
+export const getAdminEmployers = async (query: string = "") => {
   const session = await auth();
 
   if (session?.user?.role !== "ADMIN") {
@@ -13,14 +13,15 @@ export const getAdminTalents = async (query: string = "") => {
 
   try {
     const where: Prisma.UserWhereInput = {
-      role: "TALENT",
+      role: "EMPLOYER",
       OR: [
         { name: { contains: query, mode: "insensitive" } },
+        { companyName: { contains: query, mode: "insensitive" } },
         { email: { contains: query, mode: "insensitive" } },
       ],
     };
 
-    const talents = await db.user.findMany({
+    const employers = await db.user.findMany({
       where,
       orderBy: { createdAt: "desc" },
       select: {
@@ -31,17 +32,19 @@ export const getAdminTalents = async (query: string = "") => {
         role: true,
         emailVerified: true,
         createdAt: true,
-        talentProfile: {
+        companyName: true,
+        employerProfile: {
           select: {
+            companyName: true,
             isVerified: true,
           },
         },
       },
     });
 
-    return { success: talents };
+    return { success: employers };
   } catch (error) {
-    console.error("Error fetching talents:", error);
-    return { error: "Failed to fetch talents" };
+    console.error("Error fetching employers:", error);
+    return { error: "Failed to fetch employers" };
   }
 };

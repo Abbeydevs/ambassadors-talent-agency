@@ -119,6 +119,7 @@ model TalentProfile {
   hairColor String?
   ethnicity String?
   languages String[]
+  isVerified Boolean @default(false)
 
   talentCategories   String[]
   yearsOfExperience  Int?
@@ -231,6 +232,7 @@ model EmployerProfile {
   companySize        Int?
   foundedYear        Int?
   contactInfo        Json?
+  companyName String?
   isVerified     Boolean @default(false)
   verificationRequests VerificationRequest[]
 

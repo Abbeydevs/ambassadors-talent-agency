@@ -16,9 +16,9 @@ import { Button } from "@/components/ui/button";
 import {
   Search,
   MoreHorizontal,
-  User,
-  ShieldAlert,
+  Building2,
   ShieldCheck,
+  ShieldAlert,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -26,44 +26,46 @@ import {
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
-  DropdownMenuSeparator,
   DropdownMenuTrigger,
+  DropdownMenuSeparator,
 } from "@/components/ui/dropdown-menu";
-import { toggleTalentVerification } from "@/actions/admin/verify-talent";
 import { toast } from "sonner";
+import { toggleEmployerVerification } from "@/actions/admin/verify-employer";
 
 type UserRole = "ADMIN" | "TALENT" | "EMPLOYER" | "USER";
 
-interface TalentUser {
+interface EmployerUser {
   id: string;
   name: string | null;
+  companyName: string | null;
   email: string | null;
   image: string | null;
   role: UserRole | string;
   emailVerified: Date | null;
   createdAt: Date;
-  talentProfile: {
+  employerProfile: {
     isVerified: boolean;
   } | null;
 }
 
-interface TalentsTableProps {
-  talents: TalentUser[];
+interface EmployersTableProps {
+  employers: EmployerUser[];
 }
 
-export const TalentsTable = ({ talents }: TalentsTableProps) => {
+export const EmployersTable = ({ employers }: EmployersTableProps) => {
   const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();
 
-  const filteredTalents = talents.filter(
-    (talent) =>
-      talent.name?.toLowerCase().includes(search.toLowerCase()) ||
-      talent.email?.toLowerCase().includes(search.toLowerCase())
+  const filteredEmployers = employers.filter(
+    (emp) =>
+      emp.name?.toLowerCase().includes(search.toLowerCase()) ||
+      emp.email?.toLowerCase().includes(search.toLowerCase()) ||
+      emp.companyName?.toLowerCase().includes(search.toLowerCase())
   );
 
   const onVerifyToggle = (userId: string, currentStatus: boolean) => {
     startTransition(() => {
-      toggleTalentVerification(userId, !currentStatus)
+      toggleEmployerVerification(userId, !currentStatus)
         .then((data) => {
           if (data.error) toast.error(data.error);
           else toast.success(data.success);
@@ -74,12 +76,11 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
       <div className="flex items-center gap-2 max-w-sm">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
           <Input
-            placeholder="Search talents..."
+            placeholder="Search companies..."
             className="pl-8 bg-white"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
@@ -87,77 +88,72 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="rounded-md border bg-white">
         <Table>
           <TableHeader>
             <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Email Status</TableHead>
-              <TableHead>Profile Status</TableHead>
+              <TableHead>Company / User</TableHead>
+              <TableHead>Status</TableHead>
+              <TableHead>Verification</TableHead>
               <TableHead>Joined Date</TableHead>
               <TableHead className="text-right">Actions</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {filteredTalents.length === 0 ? (
+            {filteredEmployers.length === 0 ? (
               <TableRow>
                 <TableCell
-                  colSpan={4}
+                  colSpan={5}
                   className="h-24 text-center text-muted-foreground"
                 >
-                  No talents found.
+                  No employers found.
                 </TableCell>
               </TableRow>
             ) : (
-              filteredTalents.map((talent) => {
-                const isProfileVerified =
-                  talent.talentProfile?.isVerified || false;
+              filteredEmployers.map((emp) => {
+                const isVerified = emp.employerProfile?.isVerified || false;
+                const companyName = emp.companyName || "No Company Name";
+
                 return (
-                  <TableRow key={talent.id}>
+                  <TableRow key={emp.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
-                          <AvatarImage src={talent.image || ""} />
-                          <AvatarFallback className="bg-blue-100 text-blue-600">
-                            <User className="h-4 w-4" />
+                          <AvatarImage src={emp.image || ""} />
+                          <AvatarFallback className="bg-slate-100 text-slate-600">
+                            <Building2 className="h-4 w-4" />
                           </AvatarFallback>
                         </Avatar>
                         <div className="flex flex-col">
                           <span className="font-medium text-sm text-slate-900">
-                            {talent.name || "No Name"}
+                            {companyName}
                           </span>
                           <span className="text-xs text-slate-500">
-                            {talent.email}
+                            {emp.name} ({emp.email})
                           </span>
                         </div>
                       </div>
                     </TableCell>
                     <TableCell>
                       <Badge
-                        variant="secondary"
-                        className={
-                          talent.emailVerified
-                            ? "bg-green-100 text-green-700 hover:bg-green-100"
-                            : "bg-amber-100 text-amber-700 hover:bg-amber-100"
-                        }
+                        variant={emp.emailVerified ? "outline" : "secondary"}
                       >
-                        {talent.emailVerified ? "Verified" : "Pending"}
+                        {emp.emailVerified ? "Email Verified" : "Unverified"}
                       </Badge>
                     </TableCell>
                     <TableCell>
                       <Badge
                         className={
-                          isProfileVerified
+                          isVerified
                             ? "bg-blue-100 text-blue-700 hover:bg-blue-100 border-0"
                             : "bg-slate-100 text-slate-500 hover:bg-slate-100 border-0"
                         }
                       >
-                        {isProfileVerified ? "Verified Talent" : "Not Verified"}
+                        {isVerified ? "Verified Business" : "Not Verified"}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-slate-500 text-sm">
-                      {format(new Date(talent.createdAt), "MMM d, yyyy")}
+                      {format(new Date(emp.createdAt), "MMM d, yyyy")}
                     </TableCell>
                     <TableCell className="text-right">
                       <DropdownMenu>
@@ -166,20 +162,21 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                             variant="ghost"
                             size="icon"
                             className="h-8 w-8"
+                            disabled={isPending}
                           >
                             <MoreHorizontal className="h-4 w-4" />
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>View Profile</DropdownMenuItem>
+                          <DropdownMenuItem>View Company</DropdownMenuItem>
+
                           <DropdownMenuSeparator />
+
                           <DropdownMenuItem
-                            onClick={() =>
-                              onVerifyToggle(talent.id, isProfileVerified)
-                            }
+                            onClick={() => onVerifyToggle(emp.id, isVerified)}
                           >
-                            {isProfileVerified ? (
+                            {isVerified ? (
                               <>
                                 <ShieldAlert className="h-4 w-4" /> Revoke
                                 Verification
@@ -187,14 +184,11 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                             ) : (
                               <>
                                 <ShieldCheck className="h-4 w-4 text-blue-600" />{" "}
-                                Verify Profile
+                                Verify Business
                               </>
                             )}
                           </DropdownMenuItem>
-                          <DropdownMenuSeparator />
-                          <DropdownMenuItem>
-                            View Activity Logs
-                          </DropdownMenuItem>
+
                           <DropdownMenuSeparator />
                           <DropdownMenuItem className="text-red-600 focus:text-red-600">
                             Suspend Account
