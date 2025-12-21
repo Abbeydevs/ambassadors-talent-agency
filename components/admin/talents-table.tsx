@@ -22,6 +22,7 @@ import {
   ShieldCheck,
   CheckCircle,
   Ban,
+  Pencil,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -35,6 +36,7 @@ import {
 import { toggleTalentVerification } from "@/actions/admin/verify-talent";
 import { toast } from "sonner";
 import { toggleUserSuspension } from "@/actions/admin/suspend-user";
+import { EditUserDialog } from "./edit-user-dialog";
 
 type UserRole = "ADMIN" | "TALENT" | "EMPLOYER" | "USER";
 
@@ -59,6 +61,7 @@ interface TalentsTableProps {
 export const TalentsTable = ({ talents }: TalentsTableProps) => {
   const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();
+  const [editingUser, setEditingUser] = useState<TalentUser | null>(null);
 
   const filteredTalents = talents.filter(
     (talent) =>
@@ -90,6 +93,18 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
 
   return (
     <div className="space-y-4">
+      {editingUser && (
+        <EditUserDialog
+          isOpen={!!editingUser}
+          onClose={() => setEditingUser(null)}
+          user={{
+            id: editingUser.id,
+            name: editingUser.name,
+            email: editingUser.email,
+            role: "TALENT",
+          }}
+        />
+      )}
       {/* Search Bar */}
       <div className="flex items-center gap-2 max-w-sm">
         <div className="relative flex-1">
@@ -221,6 +236,12 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem>
                             View Activity Logs
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setEditingUser(talent)}
+                          >
+                            <Pencil className="mr-2 h-4 w-4" /> Edit Info
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
