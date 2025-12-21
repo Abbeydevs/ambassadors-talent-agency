@@ -19,6 +19,8 @@ import {
   Building2,
   ShieldCheck,
   ShieldAlert,
+  CheckCircle,
+  Ban,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -31,6 +33,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toast } from "sonner";
 import { toggleEmployerVerification } from "@/actions/admin/verify-employer";
+import { toggleUserSuspension } from "@/actions/admin/suspend-user";
 
 type UserRole = "ADMIN" | "TALENT" | "EMPLOYER" | "USER";
 
@@ -43,6 +46,7 @@ interface EmployerUser {
   role: UserRole | string;
   emailVerified: Date | null;
   createdAt: Date;
+  isSuspended: boolean;
   employerProfile: {
     isVerified: boolean;
   } | null;
@@ -66,6 +70,17 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
   const onVerifyToggle = (userId: string, currentStatus: boolean) => {
     startTransition(() => {
       toggleEmployerVerification(userId, !currentStatus)
+        .then((data) => {
+          if (data.error) toast.error(data.error);
+          else toast.success(data.success);
+        })
+        .catch(() => toast.error("Something went wrong"));
+    });
+  };
+
+  const onSuspendToggle = (userId: string, currentStatus: boolean) => {
+    startTransition(() => {
+      toggleUserSuspension(userId, !currentStatus)
         .then((data) => {
           if (data.error) toast.error(data.error);
           else toast.success(data.success);
@@ -115,7 +130,10 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
                 const companyName = emp.companyName || "No Company Name";
 
                 return (
-                  <TableRow key={emp.id}>
+                  <TableRow
+                    key={emp.id}
+                    className={emp.isSuspended ? "bg-red-50/50" : ""}
+                  >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
@@ -126,7 +144,15 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
                         </Avatar>
                         <div className="flex flex-col">
                           <span className="font-medium text-sm text-slate-900">
-                            {companyName}
+                            {companyName}{" "}
+                            {emp.isSuspended && (
+                              <Badge
+                                variant="destructive"
+                                className="h-5 text-[10px] px-1.5"
+                              >
+                                BANNED
+                              </Badge>
+                            )}
                           </span>
                           <span className="text-xs text-slate-500">
                             {emp.name} ({emp.email})
@@ -190,8 +216,26 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
                           </DropdownMenuItem>
 
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                            Suspend Account
+                          <DropdownMenuItem
+                            onClick={() =>
+                              onSuspendToggle(emp.id, emp.isSuspended)
+                            }
+                            className={
+                              emp.isSuspended
+                                ? "text-green-600 focus:text-green-600"
+                                : "text-red-600 focus:text-red-600"
+                            }
+                          >
+                            {emp.isSuspended ? (
+                              <>
+                                <CheckCircle className="h-4 w-4" /> Activate
+                                Account
+                              </>
+                            ) : (
+                              <>
+                                <Ban className="h-4 w-4" /> Suspend Account
+                              </>
+                            )}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>

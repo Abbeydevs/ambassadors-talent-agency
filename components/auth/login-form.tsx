@@ -18,11 +18,16 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
+import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
+import { Ban } from "lucide-react";
+import { useSearchParams } from "next/navigation";
 
 export const LoginForm = () => {
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
+  const searchParams = useSearchParams();
+  const urlError = searchParams.get("error");
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -54,6 +59,17 @@ export const LoginForm = () => {
           </h1>
           <p className="text-gray-300">Login to access your dashboard</p>
         </div>
+
+        {urlError === "Suspended" && (
+          <Alert variant="destructive">
+            <Ban className="h-4 w-4" />
+            <AlertTitle>Account Suspended</AlertTitle>
+            <AlertDescription>
+              Your account has been banned due to a violation of our policies.
+              Please contact support.
+            </AlertDescription>
+          </Alert>
+        )}
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">

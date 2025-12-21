@@ -33,6 +33,7 @@ export const getAdminEmployers = async (query: string = "") => {
         emailVerified: true,
         createdAt: true,
         companyName: true,
+        isSuspended: true,
         employerProfile: {
           select: {
             companyName: true,

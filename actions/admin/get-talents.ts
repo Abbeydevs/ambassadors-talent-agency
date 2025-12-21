@@ -31,6 +31,7 @@ export const getAdminTalents = async (query: string = "") => {
         role: true,
         emailVerified: true,
         createdAt: true,
+        isSuspended: true,
         talentProfile: {
           select: {
             isVerified: true,

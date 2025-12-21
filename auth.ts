@@ -42,6 +42,19 @@ export const {
     }),
   ],
   callbacks: {
+    async signIn({ user }) {
+      if (!user.id) return true;
+
+      const existingUser = await db.user.findUnique({
+        where: { id: user.id },
+      });
+
+      if (existingUser?.isSuspended) {
+        return "/auth/login?error=Suspended";
+      }
+
+      return true;
+    },
     async jwt({ token }) {
       if (!token.sub) return token;
 

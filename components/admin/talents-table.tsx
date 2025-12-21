@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import { useState, useTransition } from "react";
@@ -19,6 +20,8 @@ import {
   User,
   ShieldAlert,
   ShieldCheck,
+  CheckCircle,
+  Ban,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -31,6 +34,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { toggleTalentVerification } from "@/actions/admin/verify-talent";
 import { toast } from "sonner";
+import { toggleUserSuspension } from "@/actions/admin/suspend-user";
 
 type UserRole = "ADMIN" | "TALENT" | "EMPLOYER" | "USER";
 
@@ -42,6 +46,7 @@ interface TalentUser {
   role: UserRole | string;
   emailVerified: Date | null;
   createdAt: Date;
+  isSuspended: boolean;
   talentProfile: {
     isVerified: boolean;
   } | null;
@@ -64,6 +69,17 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
   const onVerifyToggle = (userId: string, currentStatus: boolean) => {
     startTransition(() => {
       toggleTalentVerification(userId, !currentStatus)
+        .then((data) => {
+          if (data.error) toast.error(data.error);
+          else toast.success(data.success);
+        })
+        .catch(() => toast.error("Something went wrong"));
+    });
+  };
+
+  const onSuspendToggle = (userId: string, currentStatus: boolean) => {
+    startTransition(() => {
+      toggleUserSuspension(userId, !currentStatus)
         .then((data) => {
           if (data.error) toast.error(data.error);
           else toast.success(data.success);
@@ -114,7 +130,10 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                 const isProfileVerified =
                   talent.talentProfile?.isVerified || false;
                 return (
-                  <TableRow key={talent.id}>
+                  <TableRow
+                    key={talent.id}
+                    className={talent.isSuspended ? "bg-red-50/50" : ""}
+                  >
                     <TableCell>
                       <div className="flex items-center gap-3">
                         <Avatar className="h-9 w-9">
@@ -126,6 +145,14 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                         <div className="flex flex-col">
                           <span className="font-medium text-sm text-slate-900">
                             {talent.name || "No Name"}
+                            {talent.isSuspended && (
+                              <Badge
+                                variant="destructive"
+                                className="h-5 text-[10px] px-1.5"
+                              >
+                                BANNED
+                              </Badge>
+                            )}
                           </span>
                           <span className="text-xs text-slate-500">
                             {talent.email}
@@ -196,8 +223,26 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                             View Activity Logs
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
-                          <DropdownMenuItem className="text-red-600 focus:text-red-600">
-                            Suspend Account
+                          <DropdownMenuItem
+                            onClick={() =>
+                              onSuspendToggle(talent.id, talent.isSuspended)
+                            }
+                            className={
+                              talent.isSuspended
+                                ? "text-green-600 focus:text-green-600"
+                                : "text-red-600 focus:text-red-600"
+                            }
+                          >
+                            {talent.isSuspended ? (
+                              <>
+                                <CheckCircle className="mr-2 h-4 w-4" />{" "}
+                                Activate Account
+                              </>
+                            ) : (
+                              <>
+                                <Ban className="mr-2 h-4 w-4" /> Suspend Account
+                              </>
+                            )}
                           </DropdownMenuItem>
                         </DropdownMenuContent>
                       </DropdownMenu>
