@@ -22,6 +22,8 @@ import {
   CheckCircle,
   Ban,
   Pencil,
+  History,
+  Eye,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -36,6 +38,7 @@ import { toast } from "sonner";
 import { toggleEmployerVerification } from "@/actions/admin/verify-employer";
 import { toggleUserSuspension } from "@/actions/admin/suspend-user";
 import { EditUserDialog } from "./edit-user-dialog";
+import { ActivityLogsDialog } from "./activity-logs-dialog";
 
 type UserRole = "ADMIN" | "TALENT" | "EMPLOYER" | "USER";
 
@@ -62,6 +65,9 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
   const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();
   const [editingUser, setEditingUser] = useState<EmployerUser | null>(null);
+  const [viewingLogsUser, setViewingLogsUser] = useState<EmployerUser | null>(
+    null
+  );
 
   const filteredEmployers = employers.filter(
     (emp) =>
@@ -107,6 +113,18 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
           }}
         />
       )}
+
+      {viewingLogsUser && (
+        <ActivityLogsDialog
+          isOpen={!!viewingLogsUser}
+          onClose={() => setViewingLogsUser(null)}
+          userId={viewingLogsUser.id}
+          userName={
+            viewingLogsUser.companyName || viewingLogsUser.name || "User"
+          }
+        />
+      )}
+
       <div className="flex items-center gap-2 max-w-sm">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -211,7 +229,10 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
                           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-                          <DropdownMenuItem>View Company</DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem>
+                            <Eye /> View Company
+                          </DropdownMenuItem>
 
                           <DropdownMenuSeparator />
 
@@ -233,7 +254,13 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
 
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => setEditingUser(emp)}>
-                            <Pencil className="mr-2 h-4 w-4" /> Edit Info
+                            <Pencil className="h-4 w-4" /> Edit Info
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setViewingLogsUser(emp)}
+                          >
+                            <History className="h-4 w-4" /> View Activity Logs
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem

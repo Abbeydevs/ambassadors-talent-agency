@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { logActivity } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 
 export const toggleEmployerVerification = async (
@@ -19,6 +20,12 @@ export const toggleEmployerVerification = async (
       where: { userId },
       data: { isVerified: shouldVerify },
     });
+
+    await logActivity(
+      userId,
+      shouldVerify ? "VERIFIED_BUSINESS" : "UNVERIFIED_BUSINESS",
+      "Admin toggled business verification"
+    );
 
     revalidatePath("/admin/employers");
     return {

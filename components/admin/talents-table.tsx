@@ -23,6 +23,7 @@ import {
   CheckCircle,
   Ban,
   Pencil,
+  History,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -37,6 +38,7 @@ import { toggleTalentVerification } from "@/actions/admin/verify-talent";
 import { toast } from "sonner";
 import { toggleUserSuspension } from "@/actions/admin/suspend-user";
 import { EditUserDialog } from "./edit-user-dialog";
+import { ActivityLogsDialog } from "./activity-logs-dialog";
 
 type UserRole = "ADMIN" | "TALENT" | "EMPLOYER" | "USER";
 
@@ -62,6 +64,9 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
   const [search, setSearch] = useState("");
   const [isPending, startTransition] = useTransition();
   const [editingUser, setEditingUser] = useState<TalentUser | null>(null);
+  const [viewingLogsUser, setViewingLogsUser] = useState<TalentUser | null>(
+    null
+  );
 
   const filteredTalents = talents.filter(
     (talent) =>
@@ -105,6 +110,16 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
           }}
         />
       )}
+
+      {viewingLogsUser && (
+        <ActivityLogsDialog
+          isOpen={!!viewingLogsUser}
+          onClose={() => setViewingLogsUser(null)}
+          userId={viewingLogsUser.id}
+          userName={viewingLogsUser.name || "User"}
+        />
+      )}
+
       {/* Search Bar */}
       <div className="flex items-center gap-2 max-w-sm">
         <div className="relative flex-1">
@@ -241,9 +256,16 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                           <DropdownMenuItem
                             onClick={() => setEditingUser(talent)}
                           >
-                            <Pencil className="mr-2 h-4 w-4" /> Edit Info
+                            <Pencil className="h-4 w-4" /> Edit Info
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setViewingLogsUser(talent)}
+                          >
+                            <History className="h-4 w-4" /> View Activity Logs
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+
                           <DropdownMenuItem
                             onClick={() =>
                               onSuspendToggle(talent.id, talent.isSuspended)

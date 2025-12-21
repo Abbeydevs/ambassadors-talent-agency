@@ -89,6 +89,8 @@ model User {
   talentProfile TalentProfile?
 
   employerProfile EmployerProfile?
+  activitiesPerformed ActivityLog[] @relation("ActorActivities")
+  activitiesReceived  ActivityLog[] @relation("TargetActivities")
 }
 
 model PasswordResetToken {
@@ -376,6 +378,24 @@ model VerificationRequest {
   updatedAt   DateTime @updatedAt
 
   @@index([employerId])
+}
+
+model ActivityLog {
+  id           String   @id @default(cuid())
+  
+  actorId      String
+  actor        User     @relation("ActorActivities", fields: [actorId], references: [id], onDelete: Cascade)
+
+  targetUserId String?
+  targetUser   User?    @relation("TargetActivities", fields: [targetUserId], references: [id], onDelete: Cascade)
+
+  action       String  
+  details      String?  @db.Text
+  
+  createdAt    DateTime @default(now())
+
+  @@index([actorId])
+  @@index([targetUserId])
 }
 
 enum VerificationStatus {

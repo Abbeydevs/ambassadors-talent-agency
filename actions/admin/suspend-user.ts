@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { logActivity } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 
 export const toggleUserSuspension = async (
@@ -19,6 +20,12 @@ export const toggleUserSuspension = async (
       where: { id: userId },
       data: { isSuspended: shouldSuspend },
     });
+
+    await logActivity(
+      userId,
+      shouldSuspend ? "SUSPENDED_ACCOUNT" : "ACTIVATED_ACCOUNT",
+      "Admin toggled account suspension"
+    );
 
     revalidatePath("/admin/talents");
     revalidatePath("/admin/employers");

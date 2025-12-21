@@ -2,6 +2,7 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
+import { logActivity } from "@/lib/logger";
 import { revalidatePath } from "next/cache";
 
 export const toggleTalentVerification = async (
@@ -19,6 +20,12 @@ export const toggleTalentVerification = async (
       where: { userId },
       data: { isVerified: shouldVerify },
     });
+
+    await logActivity(
+      userId,
+      shouldVerify ? "VERIFIED_PROFILE" : "UNVERIFIED_PROFILE",
+      "Admin toggled talent verification"
+    );
 
     revalidatePath("/admin/talents");
     return {

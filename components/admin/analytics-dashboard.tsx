@@ -28,6 +28,7 @@ import {
   Tooltip,
   ResponsiveContainer,
 } from "recharts";
+import { RecentActivityList } from "@/components/admin/recent-activity-list";
 
 interface UserGrowthItem {
   name: string;
@@ -37,6 +38,19 @@ interface UserGrowthItem {
 interface RevenueItem {
   name: string;
   revenue: number;
+}
+
+interface ActivityLog {
+  id: string;
+  action: string;
+  details: string | null;
+  createdAt: Date;
+  actor: { name: string | null; image: string | null };
+  targetUser: {
+    name: string | null;
+    email: string | null;
+    companyName: string | null;
+  } | null;
 }
 
 interface AnalyticsDashboardProps {
@@ -52,9 +66,10 @@ interface AnalyticsDashboardProps {
       revenue: RevenueItem[];
     };
   };
+  logs: ActivityLog[];
 }
 
-export const AnalyticsDashboard = ({ data }: AnalyticsDashboardProps) => {
+export const AnalyticsDashboard = ({ data, logs }: AnalyticsDashboardProps) => {
   return (
     <div className="space-y-6">
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
@@ -81,7 +96,6 @@ export const AnalyticsDashboard = ({ data }: AnalyticsDashboardProps) => {
         </div>
       </div>
 
-      {/* Stats Cards */}
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
@@ -131,103 +145,109 @@ export const AnalyticsDashboard = ({ data }: AnalyticsDashboardProps) => {
         </Card>
       </div>
 
-      {/* Charts Section */}
-      <div className="grid gap-4 md:grid-cols-2">
-        {/* User Growth Chart */}
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>User Growth</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <LineChart data={data.charts.userGrowth}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#E5E7EB"
-                  />
-                  <XAxis
-                    dataKey="name"
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  <YAxis
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value: number) => `${value}`}
-                  />
-                  <Tooltip
-                    contentStyle={{
-                      backgroundColor: "#fff",
-                      borderRadius: "8px",
-                      border: "1px solid #E5E7EB",
-                    }}
-                  />
-                  <Line
-                    type="monotone"
-                    dataKey="users"
-                    stroke="#1E40AF"
-                    strokeWidth={2}
-                    dot={false}
-                  />
-                </LineChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+      <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-7">
+        <div className="col-span-4 space-y-4">
+          <Card>
+            <CardHeader>
+              <CardTitle>User Growth</CardTitle>
+            </CardHeader>
+            <CardContent className="pl-2">
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <LineChart data={data.charts.userGrowth}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#E5E7EB"
+                    />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value: number) => `${value}`}
+                    />
+                    <Tooltip
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        border: "1px solid #E5E7EB",
+                      }}
+                    />
+                    <Line
+                      type="monotone"
+                      dataKey="users"
+                      stroke="#1E40AF"
+                      strokeWidth={2}
+                      dot={false}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
 
-        {/* Revenue Chart */}
-        <Card className="col-span-1">
-          <CardHeader>
-            <CardTitle>Revenue Overview</CardTitle>
-          </CardHeader>
-          <CardContent className="pl-2">
-            <div className="h-[300px]">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={data.charts.revenue}>
-                  <CartesianGrid
-                    strokeDasharray="3 3"
-                    vertical={false}
-                    stroke="#E5E7EB"
-                  />
-                  <XAxis
-                    dataKey="name"
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                  />
-                  {/* 👇 TYPED CORRECTLY AS NUMBER */}
-                  <YAxis
-                    stroke="#888888"
-                    fontSize={12}
-                    tickLine={false}
-                    axisLine={false}
-                    tickFormatter={(value: number) => `₦${value / 1000}k`}
-                  />
-                  <Tooltip
-                    cursor={{ fill: "#F3F4F6" }}
-                    contentStyle={{
-                      backgroundColor: "#fff",
-                      borderRadius: "8px",
-                      border: "1px solid #E5E7EB",
-                    }}
-                    formatter={(value: number | undefined) => [
-                      `₦${(value || 0).toLocaleString()}`,
-                      "Revenue",
-                    ]}
-                  />
-                  <Bar dataKey="revenue" fill="#10B981" radius={[4, 4, 0, 0]} />
-                </BarChart>
-              </ResponsiveContainer>
-            </div>
-          </CardContent>
-        </Card>
+          <Card>
+            <CardHeader>
+              <CardTitle>Revenue Overview</CardTitle>
+            </CardHeader>
+            <CardContent className="pl-2">
+              <div className="h-[300px]">
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={data.charts.revenue}>
+                    <CartesianGrid
+                      strokeDasharray="3 3"
+                      vertical={false}
+                      stroke="#E5E7EB"
+                    />
+                    <XAxis
+                      dataKey="name"
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                    />
+                    <YAxis
+                      stroke="#888888"
+                      fontSize={12}
+                      tickLine={false}
+                      axisLine={false}
+                      tickFormatter={(value: number) => `₦${value / 1000}k`}
+                    />
+                    <Tooltip
+                      cursor={{ fill: "#F3F4F6" }}
+                      contentStyle={{
+                        backgroundColor: "#fff",
+                        borderRadius: "8px",
+                        border: "1px solid #E5E7EB",
+                      }}
+                      formatter={(value: number | undefined) => [
+                        `₦${(value || 0).toLocaleString()}`,
+                        "Revenue",
+                      ]}
+                    />
+                    <Bar
+                      dataKey="revenue"
+                      fill="#10B981"
+                      radius={[4, 4, 0, 0]}
+                    />
+                  </BarChart>
+                </ResponsiveContainer>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="col-span-3">
+          <RecentActivityList logs={logs} />
+        </div>
       </div>
     </div>
   );
