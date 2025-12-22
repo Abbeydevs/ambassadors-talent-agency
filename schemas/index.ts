@@ -284,3 +284,10 @@ export const SystemSettingsSchema = z.object({
     })
     .optional(),
 });
+
+export const AnnouncementSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  message: z.string().min(10, "Message must be at least 10 characters"),
+  audience: z.enum(["ALL", "TALENT", "EMPLOYER"]),
+  sendAsEmail: z.boolean(),
+});

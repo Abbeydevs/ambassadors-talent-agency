@@ -101,6 +101,41 @@ model User {
   employerProfile EmployerProfile?
   activitiesPerformed ActivityLog[] @relation("ActorActivities")
   activitiesReceived  ActivityLog[] @relation("TargetActivities")
+  notifications       Notification[]
+  createdAnnouncements Announcement[] @relation("CreatedAnnouncements")
+}
+
+model Announcement {
+  id          String   @id @default(cuid())
+  
+  title       String
+  message     String   @db.Text
+  
+  audience    AnnouncementAudience @default(ALL) 
+  
+  sendAsEmail Boolean  @default(false)
+  
+  creatorId   String
+  creator     User     @relation("CreatedAnnouncements", fields: [creatorId], references: [id])
+  
+  createdAt   DateTime @default(now())
+}
+
+model Notification {
+  id          String   @id @default(cuid())
+  
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  title       String
+  message     String   @db.Text
+  isRead      Boolean  @default(false)
+  
+  type        NotificationType @default(SYSTEM)
+  
+  link        String?
+  
+  createdAt   DateTime @default(now())
 }
 
 model SystemSettings {
@@ -635,4 +670,18 @@ enum DisputeStatus {
   OPEN
   RESOLVED_PAY_TALENT  
   RESOLVED_REFUND     
+}
+
+enum AnnouncementAudience {
+  ALL
+  TALENT
+  EMPLOYER
+}
+
+enum NotificationType {
+  SYSTEM
+  APPLICATION
+  JOB
+  PAYMENT
+  SECURITY
 }

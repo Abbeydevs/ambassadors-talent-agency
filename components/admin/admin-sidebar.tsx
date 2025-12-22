@@ -41,6 +41,11 @@ const routes = [
     href: "/admin/finance",
   },
   {
+    label: "Communications",
+    icon: Users,
+    href: "/admin/communications",
+  },
+  {
     label: "Settings",
     icon: Settings,
     href: "/admin/settings",
