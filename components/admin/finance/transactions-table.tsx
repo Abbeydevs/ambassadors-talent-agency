@@ -19,7 +19,13 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { format } from "date-fns";
-import { ArrowUpRight, ArrowDownLeft, Download, Filter } from "lucide-react";
+import {
+  ArrowUpRight,
+  ArrowDownLeft,
+  Download,
+  Filter,
+  FileText,
+} from "lucide-react";
 
 interface Transaction {
   id: string;
@@ -43,7 +49,6 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
   const [typeFilter, setTypeFilter] = useState("ALL");
   const [statusFilter, setStatusFilter] = useState("ALL");
 
-  // 👇 Filter Logic
   const filteredTransactions = transactions.filter((tx) => {
     const matchesType = typeFilter === "ALL" || tx.type === typeFilter;
     const matchesStatus = statusFilter === "ALL" || tx.status === statusFilter;
@@ -100,41 +105,78 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
     switch (type) {
       case "DEPOSIT":
         return (
-          <Badge className="bg-blue-100 text-blue-700 hover:bg-blue-100 border-0">
+          <Badge className="bg-[#DBEAFE] text-[#1E40AF] hover:bg-[#DBEAFE] border-0 font-medium">
             Deposit
           </Badge>
         );
       case "WITHDRAWAL":
         return (
-          <Badge className="bg-orange-100 text-orange-700 hover:bg-orange-100 border-0">
+          <Badge className="bg-[#FEF3C7] text-[#92400E] hover:bg-[#FEF3C7] border-0 font-medium">
             Withdrawal
           </Badge>
         );
       case "COMMISSION":
         return (
-          <Badge className="bg-green-100 text-green-700 hover:bg-green-100 border-0">
+          <Badge className="bg-[#D1FAE5] text-[#065F46] hover:bg-[#D1FAE5] border-0 font-medium">
             Commission
           </Badge>
         );
       case "JOB_FEE":
         return (
-          <Badge className="bg-purple-100 text-purple-700 hover:bg-purple-100 border-0">
+          <Badge className="bg-[#E9D5FF] text-[#6B21A8] hover:bg-[#E9D5FF] border-0 font-medium">
             Job Fee
           </Badge>
         );
       default:
-        return <Badge variant="outline">{type.replace("_", " ")}</Badge>;
+        return (
+          <Badge variant="outline" className="font-medium">
+            {type.replace("_", " ")}
+          </Badge>
+        );
+    }
+  };
+
+  const getStatusBadge = (status: string) => {
+    switch (status) {
+      case "SUCCESSFUL":
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#10B981]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#10B981]"></span>
+            Success
+          </span>
+        );
+      case "PENDING":
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#F59E0B]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#F59E0B]"></span>
+            Pending
+          </span>
+        );
+      case "FAILED":
+        return (
+          <span className="inline-flex items-center gap-1.5 text-xs font-semibold text-[#EF4444]">
+            <span className="h-1.5 w-1.5 rounded-full bg-[#EF4444]"></span>
+            Failed
+          </span>
+        );
+      default:
+        return (
+          <span className="text-xs font-medium text-[#6B7280]">{status}</span>
+        );
     }
   };
 
   return (
     <div className="space-y-4">
-      <div className="flex flex-col sm:flex-row gap-3 justify-between items-center bg-white p-3 rounded-lg border">
-        <div className="flex items-center gap-2 w-full sm:w-auto">
-          <Filter className="h-4 w-4 text-slate-500" />
+      <div className="flex flex-col sm:flex-row gap-3 justify-between items-start sm:items-center bg-white p-4 rounded-xl border border-[#E5E7EB] shadow-sm">
+        <div className="flex items-center gap-2.5 w-full sm:w-auto flex-wrap">
+          <div className="flex items-center gap-2 text-[#6B7280] font-medium text-sm">
+            <Filter className="h-4 w-4" />
+            <span>Filters</span>
+          </div>
 
           <Select value={typeFilter} onValueChange={setTypeFilter}>
-            <SelectTrigger className="w-[140px] h-9">
+            <SelectTrigger className="w-[145px] h-9 border-[#E5E7EB] focus:border-[#1E40AF] focus:ring-[#1E40AF]">
               <SelectValue placeholder="All Types" />
             </SelectTrigger>
             <SelectContent>
@@ -147,7 +189,7 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
           </Select>
 
           <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-[140px] h-9">
+            <SelectTrigger className="w-[145px] h-9 border-[#E5E7EB] focus:border-[#1E40AF] focus:ring-[#1E40AF]">
               <SelectValue placeholder="All Status" />
             </SelectTrigger>
             <SelectContent>
@@ -163,84 +205,96 @@ export const TransactionsTable = ({ transactions }: TransactionsTableProps) => {
           variant="outline"
           size="sm"
           onClick={handleExport}
-          className="w-full sm:w-auto text-slate-700"
+          className="w-full sm:w-auto text-[#1E40AF] border-[#1E40AF] hover:bg-[#EFF6FF] hover:text-[#1E3A8A] font-medium h-9 transition-colors"
         >
           <Download className="mr-2 h-4 w-4" />
           Export CSV
         </Button>
       </div>
 
-      <div className="rounded-md border bg-white">
+      <div className="rounded-xl border border-[#E5E7EB] bg-white shadow-sm overflow-hidden">
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead>User</TableHead>
-              <TableHead>Type</TableHead>
-              <TableHead>Amount</TableHead>
-              <TableHead>Status</TableHead>
-              <TableHead>Reference</TableHead>
-              <TableHead className="text-right">Date</TableHead>
+            <TableRow className="bg-[#F9FAFB] hover:bg-[#F9FAFB] border-b border-[#E5E7EB]">
+              <TableHead className="font-semibold text-[#111827]">
+                User
+              </TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Type
+              </TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Amount
+              </TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Status
+              </TableHead>
+              <TableHead className="font-semibold text-[#111827]">
+                Reference
+              </TableHead>
+              <TableHead className="text-right font-semibold text-[#111827]">
+                Date
+              </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {filteredTransactions.length === 0 ? (
-              <TableRow>
-                <TableCell
-                  colSpan={6}
-                  className="h-24 text-center text-muted-foreground"
-                >
-                  No transactions found matching filters.
+              <TableRow className="hover:bg-transparent">
+                <TableCell colSpan={6} className="h-32 text-center">
+                  <div className="flex flex-col items-center justify-center">
+                    <div className="p-3 bg-[#F9FAFB] rounded-full mb-3">
+                      <FileText className="h-6 w-6 text-[#9CA3AF]" />
+                    </div>
+                    <p className="text-sm text-[#6B7280] font-medium">
+                      No transactions found
+                    </p>
+                    <p className="text-xs text-[#9CA3AF] mt-1">
+                      Try adjusting your filters
+                    </p>
+                  </div>
                 </TableCell>
               </TableRow>
             ) : (
               filteredTransactions.map((tx) => (
-                <TableRow key={tx.id}>
-                  <TableCell>
+                <TableRow
+                  key={tx.id}
+                  className="hover:bg-[#F9FAFB] transition-colors border-b border-[#E5E7EB] last:border-0"
+                >
+                  <TableCell className="py-4">
                     <div className="flex flex-col">
-                      <span className="font-medium text-sm text-slate-900">
+                      <span className="font-semibold text-sm text-[#111827]">
                         {tx.user.name || "Unknown"}
                       </span>
-                      <span className="text-xs text-slate-500">
+                      <span className="text-xs text-[#6B7280]">
                         {tx.user.email}
                       </span>
                     </div>
                   </TableCell>
                   <TableCell>{getTypeBadge(tx.type)}</TableCell>
                   <TableCell>
-                    <div className="flex items-center gap-1 font-medium">
+                    <div className="flex items-center gap-1.5 font-semibold">
                       {["DEPOSIT", "COMMISSION", "JOB_FEE"].includes(
                         tx.type
                       ) ? (
-                        <ArrowDownLeft className="h-4 w-4 text-green-600" />
+                        <ArrowDownLeft className="h-4 w-4 text-[#10B981]" />
                       ) : (
-                        <ArrowUpRight className="h-4 w-4 text-red-600" />
+                        <ArrowUpRight className="h-4 w-4 text-[#EF4444]" />
                       )}
                       <span
                         className={
                           ["DEPOSIT", "COMMISSION", "JOB_FEE"].includes(tx.type)
-                            ? "text-green-600"
-                            : "text-slate-900"
+                            ? "text-[#10B981]"
+                            : "text-[#111827]"
                         }
                       >
                         {formatCurrency(tx.amount)}
                       </span>
                     </div>
                   </TableCell>
-                  <TableCell>
-                    <span
-                      className={`text-xs font-medium ${
-                        tx.status === "SUCCESSFUL"
-                          ? "text-green-600"
-                          : "text-amber-600"
-                      }`}
-                    >
-                      {tx.status}
-                    </span>
+                  <TableCell>{getStatusBadge(tx.status)}</TableCell>
+                  <TableCell className="text-xs text-[#6B7280] font-mono">
+                    {tx.reference || <span className="text-[#9CA3AF]">—</span>}
                   </TableCell>
-                  <TableCell className="text-xs text-slate-500 font-mono">
-                    {tx.reference || "-"}
-                  </TableCell>
-                  <TableCell className="text-right text-slate-500 text-sm">
+                  <TableCell className="text-right text-[#6B7280] text-sm">
                     {format(new Date(tx.createdAt), "MMM d, HH:mm")}
                   </TableCell>
                 </TableRow>

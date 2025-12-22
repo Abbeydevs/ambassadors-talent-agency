@@ -4,7 +4,13 @@ import { useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { format } from "date-fns";
-import { Clock, Loader2 } from "lucide-react";
+import {
+  Clock,
+  Loader2,
+  AlertCircle,
+  Building2,
+  CreditCard,
+} from "lucide-react";
 import { processPayout } from "@/actions/admin/process-payout";
 import { toast } from "sonner";
 import {
@@ -85,91 +91,128 @@ export const PayoutRequests = ({ requests }: PayoutRequestsProps) => {
   };
 
   return (
-    <Card>
-      <CardHeader>
-        <CardTitle className="text-lg font-bold flex items-center gap-2">
-          <Clock className="h-5 w-5 text-amber-500" />
+    <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow">
+      <CardHeader className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
+        <CardTitle className="text-base font-semibold flex items-center gap-2 text-[#111827]">
+          <div className="p-2 bg-[#FEF3C7] rounded-lg">
+            <Clock className="h-4 w-4 text-[#F59E0B]" />
+          </div>
           Pending Payouts
+          {requests.length > 0 && (
+            <span className="ml-auto text-xs font-medium bg-[#F59E0B] text-white px-2.5 py-1 rounded-full">
+              {requests.length}
+            </span>
+          )}
         </CardTitle>
       </CardHeader>
-      <CardContent className="space-y-4">
+      <CardContent className="p-4">
         {requests.length === 0 ? (
-          <div className="text-center py-6 text-muted-foreground text-sm">
-            No pending payout requests.
+          <div className="flex flex-col items-center justify-center py-12 text-center">
+            <div className="p-3 bg-[#F9FAFB] rounded-full mb-3">
+              <Clock className="h-6 w-6 text-[#9CA3AF]" />
+            </div>
+            <p className="text-sm text-[#6B7280] font-medium">
+              No pending requests
+            </p>
+            <p className="text-xs text-[#9CA3AF] mt-1">
+              All payouts have been processed
+            </p>
           </div>
         ) : (
-          requests.map((req) => (
-            <div
-              key={req.id}
-              className="flex flex-col border rounded-lg bg-slate-50 p-3 gap-3"
-            >
-              <div className="flex justify-between items-start">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-semibold text-slate-900">
-                      {req.user.name}
-                    </span>
-                    <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full font-medium">
-                      Pending
-                    </span>
+          <div className="space-y-3">
+            {requests.map((req) => (
+              <div
+                key={req.id}
+                className="border border-[#E5E7EB] rounded-xl bg-white hover:border-[#1E40AF] transition-colors p-4"
+              >
+                <div className="flex justify-between items-start mb-3">
+                  <div className="flex-1">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="font-semibold text-[#111827] text-sm">
+                        {req.user.name}
+                      </span>
+                      <span className="text-xs bg-[#FEF3C7] text-[#92400E] px-2 py-0.5 rounded-md font-medium border border-[#FDE68A]">
+                        Pending
+                      </span>
+                    </div>
+                    <div className="text-xs text-[#6B7280]">
+                      {req.user.email}
+                    </div>
                   </div>
-                  <div className="text-sm text-slate-500 mt-1">
-                    Requested:{" "}
-                    <span className="font-medium text-slate-900">
+                  <div className="text-right">
+                    <div className="text-lg font-bold text-[#111827]">
                       {formatCurrency(req.amount)}
-                    </span>
+                    </div>
+                    <div className="text-xs text-[#9CA3AF] mt-0.5">
+                      {format(new Date(req.createdAt), "MMM d, yyyy")}
+                    </div>
                   </div>
                 </div>
-                <div className="text-right text-xs text-slate-400">
-                  {format(new Date(req.createdAt), "MMM d")}
+
+                <div className="bg-[#F9FAFB] rounded-lg p-3 mb-3 border border-[#E5E7EB]">
+                  <div className="flex items-start gap-3">
+                    <div className="p-2 bg-white rounded-lg border border-[#E5E7EB]">
+                      <Building2 className="h-4 w-4 text-[#6B7280]" />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-medium text-sm text-[#111827] mb-1">
+                        {req.accountName}
+                      </div>
+                      <div className="flex items-center gap-2 text-xs text-[#6B7280]">
+                        <CreditCard className="h-3 w-3" />
+                        <span className="font-medium">{req.bankName}</span>
+                        <span className="text-[#9CA3AF]">•</span>
+                        <span className="font-mono">{req.accountNumber}</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div className="flex gap-2">
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="flex-1 text-[#EF4444] hover:text-[#DC2626] hover:bg-[#FEF2F2] border-[#FEE2E2] h-9 font-medium transition-colors"
+                    onClick={() => setRejectingId(req.id)}
+                    disabled={isPending}
+                  >
+                    Reject
+                  </Button>
+                  <Button
+                    size="sm"
+                    className="flex-1 bg-[#10B981] hover:bg-[#059669] text-white h-9 font-medium shadow-sm transition-all hover:shadow"
+                    onClick={() => onApprove(req.id)}
+                    disabled={isPending}
+                  >
+                    {isPending ? (
+                      <Loader2 className="h-4 w-4 animate-spin" />
+                    ) : (
+                      "Approve"
+                    )}
+                  </Button>
                 </div>
               </div>
-
-              <div className="text-xs text-slate-500 bg-white p-2 rounded border">
-                <div className="font-medium">{req.accountName}</div>
-                <div className="font-mono">
-                  {req.bankName} • {req.accountNumber}
-                </div>
-              </div>
-
-              <div className="flex gap-2 mt-1">
-                <Button
-                  size="sm"
-                  variant="outline"
-                  className="flex-1 text-red-600 hover:text-red-700 hover:bg-red-50 border-red-200 h-8"
-                  onClick={() => setRejectingId(req.id)}
-                  disabled={isPending}
-                >
-                  Reject
-                </Button>
-                <Button
-                  size="sm"
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white h-8"
-                  onClick={() => onApprove(req.id)}
-                  disabled={isPending}
-                >
-                  {isPending ? (
-                    <Loader2 className="h-4 w-4 animate-spin" />
-                  ) : (
-                    "Approve"
-                  )}
-                </Button>
-              </div>
-            </div>
-          ))
+            ))}
+          </div>
         )}
 
-        {/* Reject Dialog */}
         <AlertDialog
           open={!!rejectingId}
           onOpenChange={() => setRejectingId(null)}
         >
-          <AlertDialogContent>
+          <AlertDialogContent className="border-[#E5E7EB]">
             <AlertDialogHeader>
-              <AlertDialogTitle>Reject Payout Request</AlertDialogTitle>
-              <AlertDialogDescription>
+              <div className="flex items-center gap-3 mb-2">
+                <div className="p-2 bg-[#FEF2F2] rounded-full">
+                  <AlertCircle className="h-5 w-5 text-[#EF4444]" />
+                </div>
+                <AlertDialogTitle className="text-[#111827]">
+                  Reject Payout Request
+                </AlertDialogTitle>
+              </div>
+              <AlertDialogDescription className="text-[#6B7280]">
                 This will refund the money back to the talent&apos;s wallet.
-                Please provide a reason.
+                Please provide a reason for rejection.
               </AlertDialogDescription>
             </AlertDialogHeader>
             <div className="py-2">
@@ -177,17 +220,23 @@ export const PayoutRequests = ({ requests }: PayoutRequestsProps) => {
                 placeholder="Reason (e.g. Invalid Account Number)"
                 value={rejectReason}
                 onChange={(e) => setRejectReason(e.target.value)}
+                className="border-[#E5E7EB] focus:border-[#1E40AF] focus:ring-[#1E40AF]"
               />
             </div>
             <AlertDialogFooter>
-              <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+              <AlertDialogCancel
+                disabled={isPending}
+                className="border-[#E5E7EB] text-[#6B7280] hover:bg-[#F9FAFB]"
+              >
+                Cancel
+              </AlertDialogCancel>
               <AlertDialogAction
                 onClick={(e) => {
                   e.preventDefault();
                   onReject();
                 }}
                 disabled={isPending || !rejectReason}
-                className="bg-red-600 hover:bg-red-700"
+                className="bg-[#EF4444] hover:bg-[#DC2626] text-white"
               >
                 {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                 Reject & Refund
