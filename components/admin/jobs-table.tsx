@@ -20,6 +20,8 @@ import {
   Trash,
   Eye,
   Loader2,
+  Star,
+  StarOff,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -43,6 +45,7 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "../ui/alert-dialog";
+import { toggleJobFeature } from "@/actions/admin/feature-job";
 
 interface JobWithEmployer {
   id: string;
@@ -53,6 +56,7 @@ interface JobWithEmployer {
   description: string;
   salaryMin?: number | null;
   salaryMax?: number | null;
+  isFeatured: boolean;
   employer: {
     user: {
       name: string | null;
@@ -123,6 +127,17 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
       default:
         return <Badge variant="outline">{status}</Badge>;
     }
+  };
+
+  const onToggleFeature = (jobId: string, currentStatus: boolean) => {
+    startTransition(() => {
+      toggleJobFeature(jobId, !currentStatus)
+        .then((data) => {
+          if (data.error) toast.error(data.error);
+          else toast.success(data.success);
+        })
+        .catch(() => toast.error("Something went wrong"));
+    });
   };
 
   return (
@@ -209,9 +224,13 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
                 <TableRow key={job.id}>
                   <TableCell>
                     <div className="flex flex-col">
-                      <span className="font-medium text-sm text-slate-900">
+                      <span className="flex items-center gap-2 font-medium text-sm text-slate-900">
                         {job.title}
+                        {job.isFeatured && (
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                        )}
                       </span>
+
                       <span className="text-xs text-slate-500">
                         {job.location}
                       </span>
@@ -246,6 +265,23 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem
+                          onClick={() =>
+                            onToggleFeature(job.id, job.isFeatured)
+                          }
+                        >
+                          {job.isFeatured ? (
+                            <>
+                              <StarOff className="h-4 w-4 text-amber-600" />{" "}
+                              Remove Feature
+                            </>
+                          ) : (
+                            <>
+                              <Star className="h-4 w-4 text-amber-600" />{" "}
+                              Feature Job
+                            </>
+                          )}
+                        </DropdownMenuItem>
                         <DropdownMenuItem onClick={() => setEditingJob(job)}>
                           <Pencil className="h-4 w-4" /> Edit Content
                         </DropdownMenuItem>
