@@ -24,6 +24,7 @@ import {
   Pencil,
   History,
   Eye,
+  Briefcase,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -39,6 +40,7 @@ import { toggleEmployerVerification } from "@/actions/admin/verify-employer";
 import { toggleUserSuspension } from "@/actions/admin/suspend-user";
 import { EditUserDialog } from "./edit-user-dialog";
 import { ActivityLogsDialog } from "./activity-logs-dialog";
+import { HiringHistoryDialog } from "./hiring-history-dialog";
 
 type UserRole = "ADMIN" | "TALENT" | "EMPLOYER" | "USER";
 
@@ -68,6 +70,8 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
   const [viewingLogsUser, setViewingLogsUser] = useState<EmployerUser | null>(
     null
   );
+  const [viewingHistoryUser, setViewingHistoryUser] =
+    useState<EmployerUser | null>(null);
 
   const filteredEmployers = employers.filter(
     (emp) =>
@@ -121,6 +125,19 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
           userId={viewingLogsUser.id}
           userName={
             viewingLogsUser.companyName || viewingLogsUser.name || "User"
+          }
+        />
+      )}
+
+      {viewingHistoryUser && (
+        <HiringHistoryDialog
+          isOpen={!!viewingHistoryUser}
+          onClose={() => setViewingHistoryUser(null)}
+          userId={viewingHistoryUser.id}
+          companyName={
+            viewingHistoryUser.companyName ||
+            viewingHistoryUser.name ||
+            "Company"
           }
         />
       )}
@@ -255,6 +272,13 @@ export const EmployersTable = ({ employers }: EmployersTableProps) => {
                           <DropdownMenuSeparator />
                           <DropdownMenuItem onClick={() => setEditingUser(emp)}>
                             <Pencil className="h-4 w-4" /> Edit Info
+                          </DropdownMenuItem>
+                          <DropdownMenuSeparator />
+                          <DropdownMenuItem
+                            onClick={() => setViewingHistoryUser(emp)}
+                          >
+                            <Briefcase className="mr-2 h-4 w-4" /> View Hiring
+                            History
                           </DropdownMenuItem>
                           <DropdownMenuSeparator />
                           <DropdownMenuItem
