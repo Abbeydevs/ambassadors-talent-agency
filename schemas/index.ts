@@ -312,3 +312,8 @@ export const ReportSchema = z.object({
   targetId: z.string().min(1),
   type: z.enum(["JOB", "USER"]),
 });
+
+export const CommentSchema = z.object({
+  content: z.string().min(1, "Comment cannot be empty"),
+  postId: z.string().min(1),
+});

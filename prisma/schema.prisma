@@ -100,6 +100,8 @@ model User {
   tickets             Ticket[]
   reportsMade         Report[]  @relation("Reporter")
   reportsReceived     Report[]  @relation("ReportedUser")
+  blogPosts     BlogPost[]    @relation("PostAuthor")
+  comments      Comment[]
 
   employerProfile EmployerProfile?
   activitiesPerformed ActivityLog[] @relation("ActorActivities")
@@ -108,21 +110,76 @@ model User {
   createdAnnouncements Announcement[] @relation("CreatedAnnouncements")
 }
 
+model BlogCategory {
+  id          String      @id @default(cuid())
+  name        String      @unique
+  slug        String      @unique 
+  description String?
+  
+  posts       BlogPost[]
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+}
+
+model BlogPost {
+  id          String      @id @default(cuid())
+  
+  title       String
+  slug        String      @unique 
+  excerpt     String?     @db.Text 
+  content     String      @db.Text 
+  coverImage  String?     
+  
+  isPublished Boolean     @default(false)
+  publishedAt DateTime?
+  
+  authorId    String
+  author      User        @relation("PostAuthor", fields: [authorId], references: [id])
+  
+  categoryId  String?
+  category    BlogCategory? @relation(fields: [categoryId], references: [id])
+  
+  comments    Comment[]
+
+  viewCount   Int         @default(0)
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  
+  @@index([authorId])
+  @@index([categoryId])
+}
+
+model Comment {
+  id          String      @id @default(cuid())
+  content     String      @db.Text
+  
+  userId      String
+  user        User        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  postId      String
+  post        BlogPost    @relation(fields: [postId], references: [id], onDelete: Cascade)
+  
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt 
+  
+  @@index([userId])
+  @@index([postId])
+}
+
 model Ticket {
   id          String   @id @default(cuid())
   
   subject     String
-  message     String   @db.Text  // The user's issue
+  message     String   @db.Text 
   
-  // Tracking fields
   status      TicketStatus   @default(OPEN)
   priority    TicketPriority @default(MEDIUM)
   
-  // Who sent it?
   userId      String
   user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   
-  // Admin internal notes (optional)
   adminNotes  String?  @db.Text
 
   createdAt   DateTime @default(now())
