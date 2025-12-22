@@ -44,10 +44,8 @@ export default async function EmployerJobsPage({
     return redirect("/employer/settings");
   }
 
-  // Fetch Data
   const jobs = await getJobsByEmployerId(profile.id, q, status);
 
-  // Calculate stats
   const publishedCount = jobs.filter((j) => j.status === "PUBLISHED").length;
   const draftCount = jobs.filter((j) => j.status === "DRAFT").length;
   const closedCount = jobs.filter((j) => j.status === "CLOSED").length;

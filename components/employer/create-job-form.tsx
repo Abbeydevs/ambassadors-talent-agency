@@ -21,6 +21,8 @@ import {
   Globe,
   ChevronRight,
   ChevronLeft,
+  AlertTriangle,
+  Lock,
 } from "lucide-react";
 
 import { JobBasicInfo } from "@/components/employer/job-steps/job-basic-info";
@@ -48,6 +50,8 @@ export const CreateJobForm = ({ initialData }: CreateJobFormProps) => {
   const [currentStep, setCurrentStep] = useState(1);
   const [isLoading, setIsLoading] = useState(false);
   const router = useRouter();
+
+  const isRejected = initialData?.status === "REJECTED";
 
   const form = useForm<FormValues>({
     resolver: zodResolver(JobPostSchema) as Resolver<FormValues>,
@@ -79,6 +83,11 @@ export const CreateJobForm = ({ initialData }: CreateJobFormProps) => {
   });
 
   const handleGlobalSubmit = (targetStatus: "DRAFT" | "PUBLISHED") => {
+    if (isRejected && targetStatus === "PUBLISHED") {
+      toast.error("This job is rejected. You can only save edits as Draft.");
+      return;
+    }
+
     form.setValue("status", targetStatus);
 
     setIsLoading(true);
@@ -148,6 +157,21 @@ export const CreateJobForm = ({ initialData }: CreateJobFormProps) => {
   return (
     <div className="min-h-screen bg-[#F9FAFB]">
       <div className="mx-auto">
+        {isRejected && (
+          <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6 flex items-start gap-3">
+            <AlertTriangle className="h-5 w-5 text-red-600 mt-0.5" />
+            <div>
+              <h3 className="text-red-800 font-semibold">
+                This job has been flagged by Admins
+              </h3>
+              <p className="text-red-700 text-sm mt-1">
+                It has been removed from public view. You cannot publish it
+                again until the issue is resolved. You can edit the content and
+                save as Draft, but please contact support to have it restored.
+              </p>
+            </div>
+          </div>
+        )}
         {/* Header Section */}
         <div className="bg-white rounded-lg shadow-sm border border-[#E5E7EB] p-6 mb-6">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
@@ -176,15 +200,22 @@ export const CreateJobForm = ({ initialData }: CreateJobFormProps) => {
 
               <Button
                 onClick={() => handleGlobalSubmit("PUBLISHED")}
-                disabled={isLoading}
-                className="bg-[#1E40AF] hover:bg-[#1E40AF]/90 text-white shadow-md"
+                disabled={isLoading || isRejected}
+                className={cn(
+                  "shadow-md",
+                  isRejected
+                    ? "bg-slate-300 text-slate-500 cursor-not-allowed hover:bg-slate-300"
+                    : "bg-[#1E40AF] hover:bg-[#1E40AF]/90 text-white"
+                )}
               >
                 {isLoading ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
                 ) : (
                   <Globe className="h-4 w-4 mr-2" />
                 )}
-                {initialData?.status === "PUBLISHED"
+                {isRejected
+                  ? "Publishing Disabled"
+                  : initialData?.status === "PUBLISHED"
                   ? "Update & Publish"
                   : "Publish Now"}
               </Button>
@@ -295,7 +326,6 @@ export const CreateJobForm = ({ initialData }: CreateJobFormProps) => {
                 {currentStep === 4 && <JobCompensation form={form} />}
                 {currentStep === 5 && <JobReview form={form} />}
 
-                {/* Navigation Buttons */}
                 <div className="flex justify-between pt-6 border-t border-[#E5E7EB] mt-8">
                   <Button
                     type="button"
@@ -321,13 +351,22 @@ export const CreateJobForm = ({ initialData }: CreateJobFormProps) => {
                     <Button
                       type="button"
                       onClick={() => handleGlobalSubmit("PUBLISHED")}
-                      disabled={isLoading}
-                      className="bg-[#10B981] hover:bg-[#10B981]/90 text-white"
+                      disabled={isLoading || isRejected}
+                      className={cn(
+                        isRejected
+                          ? "bg-slate-300 text-slate-500 cursor-not-allowed hover:bg-slate-300"
+                          : "bg-[#10B981] hover:bg-[#10B981]/90 text-white"
+                      )}
                     >
                       {isLoading ? (
                         <>
                           <Loader2 className="h-4 w-4 animate-spin mr-2" />
                           Publishing...
+                        </>
+                      ) : isRejected ? (
+                        <>
+                          <Lock className="h-4 w-4 mr-2" />
+                          Publishing Disabled
                         </>
                       ) : (
                         <>

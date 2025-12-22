@@ -22,6 +22,8 @@ import {
   Loader2,
   Star,
   StarOff,
+  XCircle,
+  CheckCircle,
 } from "lucide-react";
 import { format } from "date-fns";
 import {
@@ -46,6 +48,7 @@ import {
   AlertDialogTitle,
 } from "../ui/alert-dialog";
 import { toggleJobFeature } from "@/actions/admin/feature-job";
+import { moderateJob } from "@/actions/admin/moderate-job";
 
 interface JobWithEmployer {
   id: string;
@@ -99,6 +102,17 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
             toast.success(data.success);
             setJobToDelete(null);
           }
+        })
+        .catch(() => toast.error("Something went wrong"));
+    });
+  };
+
+  const onModerate = (jobId: string, newStatus: "PUBLISHED" | "REJECTED") => {
+    startTransition(() => {
+      moderateJob(jobId, newStatus)
+        .then((data) => {
+          if (data.error) toast.error(data.error);
+          else toast.success(data.success);
         })
         .catch(() => toast.error("Something went wrong"));
     });
@@ -282,6 +296,24 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
                             </>
                           )}
                         </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        {job.status !== "REJECTED" && (
+                          <DropdownMenuItem
+                            onClick={() => onModerate(job.id, "REJECTED")}
+                          >
+                            <XCircle className="h-4 w-4 text-red-500" /> Flag as
+                            Inappropriate
+                          </DropdownMenuItem>
+                        )}
+                        {job.status !== "PUBLISHED" && (
+                          <DropdownMenuItem
+                            onClick={() => onModerate(job.id, "PUBLISHED")}
+                          >
+                            <CheckCircle className="h-4 w-4 text-green-600" />{" "}
+                            Approve / Restore
+                          </DropdownMenuItem>
+                        )}
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem onClick={() => setEditingJob(job)}>
                           <Pencil className="h-4 w-4" /> Edit Content
                         </DropdownMenuItem>

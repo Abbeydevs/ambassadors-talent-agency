@@ -32,6 +32,13 @@ export const updateJob = async (
       return { error: "Unauthorized to edit this job" };
     }
 
+    if (existingJob.status === "REJECTED" && values.status === "PUBLISHED") {
+      return {
+        error:
+          "This job was flagged as inappropriate and cannot be published. Please contact support for further assistance.",
+      };
+    }
+
     const validatedFields = JobPostSchema.safeParse(values);
 
     if (!validatedFields.success) {
@@ -39,6 +46,12 @@ export const updateJob = async (
     }
 
     const data = validatedFields.data;
+
+    let newStatus = data.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT";
+
+    if (existingJob.status === "REJECTED") {
+      newStatus = "DRAFT";
+    }
 
     await db.job.update({
       where: { id: jobId },
@@ -69,7 +82,7 @@ export const updateJob = async (
 
         attachments: data.attachments || [],
         isFeatured: data.isFeatured,
-        status: data.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT",
+        status: newStatus as "PUBLISHED" | "DRAFT",
       },
     });
 
