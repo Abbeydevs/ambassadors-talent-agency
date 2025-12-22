@@ -57,7 +57,7 @@ export const AnnouncementForm = () => {
             toast.error(data.error);
           } else {
             toast.success(data.success);
-            form.reset(); // Clear form on success
+            form.reset();
           }
         })
         .catch(() => toast.error("Something went wrong"));
@@ -65,72 +65,84 @@ export const AnnouncementForm = () => {
   };
 
   return (
-    <Card className="h-full border-t-4 border-t-blue-600 shadow-md">
-      <CardHeader>
-        <div className="flex items-center gap-2">
-          <Megaphone className="h-5 w-5 text-blue-600" />
-          <CardTitle>Send Announcement</CardTitle>
+    <Card className="border-[#E5E7EB] shadow-sm hover:shadow-md transition-shadow">
+      <CardHeader className="border-b border-[#E5E7EB] bg-[#F9FAFB]">
+        <div className="flex items-center gap-3">
+          <div className="p-2 bg-[#EFF6FF] rounded-lg">
+            <Megaphone className="h-5 w-5 text-[#1E40AF]" />
+          </div>
+          <div>
+            <CardTitle className="text-base font-semibold text-[#111827]">
+              Send Announcement
+            </CardTitle>
+            <CardDescription className="text-xs text-[#6B7280] mt-0.5">
+              Broadcast messages to users via dashboard notification
+            </CardDescription>
+          </div>
         </div>
-        <CardDescription>
-          Broadcast a message to users via dashboard notification.
-        </CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="pt-6">
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-            {/* 1. Title */}
+          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
             <FormField
               control={form.control}
               name="title"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Subject / Title</FormLabel>
+                  <FormLabel className="text-sm font-semibold text-[#111827]">
+                    Subject / Title
+                  </FormLabel>
                   <FormControl>
                     <Input
                       placeholder="e.g. System Maintenance Update"
+                      className="border-[#E5E7EB] focus:border-[#1E40AF] focus:ring-[#1E40AF] h-10"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[#EF4444]" />
                 </FormItem>
               )}
             />
 
-            {/* 2. Message Body */}
             <FormField
               control={form.control}
               name="message"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Message Content</FormLabel>
+                  <FormLabel className="text-sm font-semibold text-[#111827]">
+                    Message Content
+                  </FormLabel>
                   <FormControl>
                     <Textarea
                       placeholder="Type your announcement here..."
-                      className="min-h-[120px]"
+                      className="min-h-[140px] border-[#E5E7EB] focus:border-[#1E40AF] focus:ring-[#1E40AF] resize-none"
                       {...field}
                     />
                   </FormControl>
-                  <FormMessage />
+                  <FormMessage className="text-[#EF4444]" />
                 </FormItem>
               )}
             />
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              {/* 3. Audience Selector */}
+            <div className="grid grid-cols-1 gap-4">
               <FormField
                 control={form.control}
                 name="audience"
                 render={({ field }) => (
                   <FormItem>
-                    <FormLabel>Target Audience</FormLabel>
+                    <FormLabel className="text-sm font-semibold text-[#111827]">
+                      Target Audience
+                    </FormLabel>
                     <Select
                       onValueChange={field.onChange}
                       defaultValue={field.value}
                     >
                       <FormControl>
-                        <SelectTrigger>
-                          <Users className="h-4 w-4 mr-2 text-slate-500" />
-                          <SelectValue placeholder="Select audience" />
+                        <SelectTrigger className="border-[#E5E7EB] focus:border-[#1E40AF] focus:ring-[#1E40AF] h-10">
+                          <div className="flex items-center gap-2">
+                            <Users className="h-4 w-4 text-[#6B7280]" />
+                            <SelectValue placeholder="Select audience" />
+                          </div>
                         </SelectTrigger>
                       </FormControl>
                       <SelectContent>
@@ -139,29 +151,37 @@ export const AnnouncementForm = () => {
                         <SelectItem value="EMPLOYER">Employers Only</SelectItem>
                       </SelectContent>
                     </Select>
-                    <FormMessage />
+                    <FormMessage className="text-[#EF4444]" />
                   </FormItem>
                 )}
               />
 
-              {/* 4. Email Toggle */}
               <FormField
                 control={form.control}
                 name="sendAsEmail"
                 render={({ field }) => (
-                  <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
-                    <div className="space-y-0.5">
-                      <FormLabel className="text-sm flex items-center gap-2">
-                        <Mail className="h-4 w-4 text-slate-500" />
-                        Send via Email
-                      </FormLabel>
+                  <FormItem>
+                    <div className="flex flex-row items-center justify-between rounded-lg border border-[#E5E7EB] p-4 bg-[#F9FAFB]">
+                      <div className="flex items-center gap-2">
+                        <div className="p-1.5 bg-white rounded-md border border-[#E5E7EB]">
+                          <Mail className="h-4 w-4 text-[#6B7280]" />
+                        </div>
+                        <div>
+                          <FormLabel className="text-sm font-semibold text-[#111827] cursor-pointer">
+                            Send via Email
+                          </FormLabel>
+                          <p className="text-xs text-[#6B7280] mt-0.5">
+                            Also deliver to user inboxes
+                          </p>
+                        </div>
+                      </div>
+                      <FormControl>
+                        <Switch
+                          checked={field.value}
+                          onCheckedChange={field.onChange}
+                        />
+                      </FormControl>
                     </div>
-                    <FormControl>
-                      <Switch
-                        checked={field.value}
-                        onCheckedChange={field.onChange}
-                      />
-                    </FormControl>
                   </FormItem>
                 )}
               />
@@ -169,7 +189,7 @@ export const AnnouncementForm = () => {
 
             <Button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700"
+              className="w-full bg-[#1E40AF] hover:bg-[#1E3A8A] text-white h-11 font-semibold shadow-sm transition-all hover:shadow"
               disabled={isPending}
             >
               {isPending ? (
