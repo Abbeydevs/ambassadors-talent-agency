@@ -1,6 +1,9 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 import {
   Dialog,
   DialogContent,
@@ -8,9 +11,6 @@ import {
   DialogTitle,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
 import { adminUpdateUser } from "@/actions/admin/update-user";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -33,15 +33,11 @@ export const EditUserDialog = ({
   user,
 }: EditUserDialogProps) => {
   const [isPending, startTransition] = useTransition();
-
-  // Local state for form fields
   const [name, setName] = useState(user.name || "");
   const [email, setEmail] = useState(user.email || "");
   const [companyName, setCompanyName] = useState(user.companyName || "");
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
+  const handleSubmit = () => {
     startTransition(() => {
       adminUpdateUser({
         userId: user.id,
@@ -64,60 +60,89 @@ export const EditUserDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px] bg-white">
+      <DialogContent className="sm:max-w-[500px] bg-white">
         <DialogHeader>
-          <DialogTitle>Edit User Info</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-900">
+            Edit User Information
+          </DialogTitle>
+          <p className="text-sm text-gray-500 mt-1">
+            Update user details below
+          </p>
         </DialogHeader>
 
-        <form onSubmit={handleSubmit} className="space-y-4 mt-2">
+        <div className="space-y-5 mt-4">
           <div className="space-y-2">
-            <Label htmlFor="name">Full Name</Label>
+            <Label htmlFor="name" className="text-sm font-medium text-gray-900">
+              Full Name
+            </Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
               disabled={isPending}
+              className="bg-white border-gray-200 focus-visible:ring-blue-600"
+              placeholder="Enter full name"
             />
           </div>
 
           {user.role === "EMPLOYER" && (
             <div className="space-y-2">
-              <Label htmlFor="companyName">Company Name</Label>
+              <Label
+                htmlFor="companyName"
+                className="text-sm font-medium text-gray-900"
+              >
+                Company Name
+              </Label>
               <Input
                 id="companyName"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 disabled={isPending}
+                className="bg-white border-gray-200 focus-visible:ring-blue-600"
+                placeholder="Enter company name"
               />
             </div>
           )}
 
           <div className="space-y-2">
-            <Label htmlFor="email">Email Address</Label>
+            <Label
+              htmlFor="email"
+              className="text-sm font-medium text-gray-900"
+            >
+              Email Address
+            </Label>
             <Input
               id="email"
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               disabled={isPending}
+              className="bg-white border-gray-200 focus-visible:ring-blue-600"
+              placeholder="Enter email address"
             />
           </div>
 
-          <DialogFooter className="mt-6">
+          <DialogFooter className="mt-6 gap-2">
             <Button
               type="button"
               variant="outline"
               onClick={onClose}
               disabled={isPending}
+              className="border-gray-200"
             >
               Cancel
             </Button>
-            <Button type="submit" disabled={isPending}>
+            <Button
+              type="button"
+              onClick={handleSubmit}
+              disabled={isPending}
+              className="bg-blue-600 hover:bg-blue-700"
+            >
               {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               Save Changes
             </Button>
           </DialogFooter>
-        </form>
+        </div>
       </DialogContent>
     </Dialog>
   );

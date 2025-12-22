@@ -14,7 +14,6 @@ import { format } from "date-fns";
 import { Loader2, Briefcase, Calendar, UserCheck } from "lucide-react";
 import { getEmployerHiringHistory } from "@/actions/admin/get-hiring-history";
 
-// Types matching the Server Action response
 interface HiredTalent {
   talent: {
     user: {

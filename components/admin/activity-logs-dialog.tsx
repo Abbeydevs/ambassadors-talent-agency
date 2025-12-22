@@ -46,15 +46,10 @@ export const ActivityLogsDialog = ({
   userName,
 }: ActivityLogsDialogProps) => {
   const [logs, setLogs] = useState<LogEntry[]>([]);
-
-  // 👇 FIX: Initialize loading to true directly.
-  // Since the component unmounts when closed, this resets automatically.
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (isOpen && userId) {
-      // 👇 REMOVED: setLoading(true) to avoid the linter error
-
       getActivityLogs(userId)
         .then((data) => {
           if (data.success) {
@@ -62,22 +57,29 @@ export const ActivityLogsDialog = ({
           }
         })
         .finally(() => {
-          setLoading(false); // Only update state when finished
+          setLoading(false);
         });
     }
   }, [isOpen, userId]);
 
-  // Helper to get icon based on action type
   const getIcon = (action: string) => {
     if (action.includes("VERIFIED"))
-      return <ShieldCheck className="h-4 w-4 text-blue-500" />;
+      return <ShieldCheck className="h-5 w-5 text-blue-600" />;
     if (action.includes("UNVERIFIED"))
-      return <ShieldAlert className="h-4 w-4 text-amber-500" />;
+      return <ShieldAlert className="h-5 w-5 text-amber-600" />;
     if (action.includes("SUSPENDED"))
-      return <Ban className="h-4 w-4 text-red-500" />;
+      return <Ban className="h-5 w-5 text-red-600" />;
     if (action.includes("ACTIVATED"))
-      return <CheckCircle className="h-4 w-4 text-green-500" />;
-    return <FileText className="h-4 w-4 text-slate-500" />;
+      return <CheckCircle className="h-5 w-5 text-green-600" />;
+    return <FileText className="h-5 w-5 text-gray-500" />;
+  };
+
+  const getIconBackground = (action: string) => {
+    if (action.includes("VERIFIED")) return "bg-blue-50";
+    if (action.includes("UNVERIFIED")) return "bg-amber-50";
+    if (action.includes("SUSPENDED")) return "bg-red-50";
+    if (action.includes("ACTIVATED")) return "bg-green-50";
+    return "bg-gray-50";
   };
 
   const formatAction = (action: string) => {
@@ -86,55 +88,76 @@ export const ActivityLogsDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[500px] bg-white">
+      <DialogContent className="sm:max-w-[600px] bg-white">
         <DialogHeader>
-          <DialogTitle>Activity Logs: {userName}</DialogTitle>
+          <DialogTitle className="text-xl font-semibold text-gray-900">
+            Activity Logs: {userName}
+          </DialogTitle>
+          <p className="text-sm text-gray-500 mt-1">
+            View all actions performed on this user
+          </p>
         </DialogHeader>
 
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="h-[500px] pr-4 mt-4">
           {loading ? (
             <div className="flex h-full items-center justify-center pt-20">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             </div>
           ) : logs.length === 0 ? (
-            <div className="text-center text-slate-500 pt-20">
-              No activity recorded for this user yet.
+            <div className="text-center pt-20 pb-10">
+              <div className="h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-8 w-8 text-gray-400" />
+              </div>
+              <p className="text-gray-900 font-medium mb-1">
+                No activity recorded
+              </p>
+              <p className="text-sm text-gray-500">
+                No actions have been performed on this user yet
+              </p>
             </div>
           ) : (
-            <div className="space-y-6 mt-4">
+            <div className="space-y-4">
               {logs.map((log) => (
                 <div
                   key={log.id}
-                  className="flex gap-4 relative pb-6 border-l border-slate-200 pl-6 last:border-0 last:pb-0"
+                  className="flex gap-4 pb-4 border-b border-gray-100 last:border-0"
                 >
-                  <div className="absolute -left-[29px] top-0 bg-white p-1 rounded-full border border-slate-200">
+                  <div
+                    className={`h-12 w-12 rounded-lg flex items-center justify-center shrink-0 ${getIconBackground(
+                      log.action
+                    )}`}
+                  >
                     {getIcon(log.action)}
                   </div>
 
-                  <div className="flex-1 space-y-1">
-                    <div className="flex items-center justify-between">
-                      <p className="text-sm font-medium text-slate-900 capitalize">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between mb-2">
+                      <p className="text-sm font-semibold text-gray-900 capitalize">
                         {formatAction(log.action)}
                       </p>
-                      <span className="text-xs text-slate-400">
+                      <span className="text-xs text-gray-500">
                         {format(new Date(log.createdAt), "MMM d, h:mm a")}
                       </span>
                     </div>
 
-                    <p className="text-sm text-slate-500">{log.details}</p>
+                    {log.details && (
+                      <p className="text-sm text-gray-600 mb-3">
+                        {log.details}
+                      </p>
+                    )}
 
-                    <div className="flex items-center gap-2 mt-2 pt-2 border-t border-slate-100">
-                      <span className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">
+                    <div className="flex items-center gap-2 pt-2 border-t border-gray-100">
+                      <span className="text-[10px] text-gray-400 uppercase tracking-wider font-semibold">
                         Performed by:
                       </span>
-                      <div className="flex items-center gap-1.5">
-                        <Avatar className="h-4 w-4">
+                      <div className="flex items-center gap-2">
+                        <Avatar className="h-5 w-5">
                           <AvatarImage src={log.actor.image || ""} />
-                          <AvatarFallback className="text-[8px]">
-                            AD
+                          <AvatarFallback className="text-[10px] bg-blue-100 text-blue-600">
+                            {log.actor.name?.charAt(0)?.toUpperCase() || "A"}
                           </AvatarFallback>
                         </Avatar>
-                        <span className="text-xs text-slate-600">
+                        <span className="text-xs text-gray-700 font-medium">
                           {log.actor.name || "Admin"}
                         </span>
                       </div>
