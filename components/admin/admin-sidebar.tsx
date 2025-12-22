@@ -32,7 +32,7 @@ const routes = [
   },
   {
     label: "Jobs",
-    icon: ShieldCheck, // Using Shield for moderation/verification feel
+    icon: ShieldCheck,
     href: "/admin/jobs",
   },
   {

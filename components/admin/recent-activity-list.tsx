@@ -26,7 +26,6 @@ interface RecentActivityListProps {
 }
 
 export const RecentActivityList = ({ logs }: RecentActivityListProps) => {
-  // Icon Helper
   const getIcon = (action: string) => {
     if (action.includes("VERIFIED"))
       return <ShieldCheck className="h-4 w-4 text-blue-500" />;
@@ -46,7 +45,6 @@ export const RecentActivityList = ({ logs }: RecentActivityListProps) => {
   return (
     <Card className="col-span-1">
       {" "}
-      {/* This ensures it fits in a grid layout */}
       <CardHeader>
         <CardTitle>Recent Activity</CardTitle>
       </CardHeader>

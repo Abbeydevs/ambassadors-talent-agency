@@ -2,72 +2,107 @@
 
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import {
-  format,
-  subMonths,
-  eachMonthOfInterval,
-  startOfMonth,
-  endOfMonth,
-} from "date-fns";
+import { startOfMonth, subMonths, format, endOfMonth } from "date-fns";
 
 export const getAdminAnalytics = async () => {
   const session = await auth();
-  if (session?.user?.role !== "ADMIN") return null;
 
-  const totalUsers = await db.user.count();
-  const totalJobs = await db.job.count();
-  const activeJobs = await db.job.count({ where: { status: "PUBLISHED" } });
+  if (session?.user?.role !== "ADMIN") {
+    return null;
+  }
 
-  const today = new Date();
-  const sixMonthsAgo = subMonths(today, 6);
+  try {
+    const totalUsers = await db.user.count({
+      where: { role: { in: ["TALENT", "EMPLOYER"] } },
+    });
 
-  const recentUsers = await db.user.findMany({
-    where: {
-      createdAt: {
-        gte: sixMonthsAgo,
+    const activeJobs = await db.job.count({
+      where: { status: "PUBLISHED" },
+    });
+
+    const totalJobs = await db.job.count();
+
+    const revenueAgg = await db.transaction.aggregate({
+      where: {
+        status: "SUCCESSFUL",
+        type: { in: ["COMMISSION", "JOB_FEE"] },
       },
-    },
-    select: { createdAt: true },
-  });
+      _sum: { amount: true },
+    });
 
-  const months = eachMonthOfInterval({
-    start: sixMonthsAgo,
-    end: today,
-  });
+    const totalRevenueValue = revenueAgg._sum.amount || 0;
 
-  const userGrowthData = months.map((month) => {
-    const monthStart = startOfMonth(month);
-    const monthEnd = endOfMonth(month);
+    const months = [];
+    for (let i = 5; i >= 0; i--) {
+      const date = subMonths(new Date(), i);
+      months.push({
+        date: date,
+        label: format(date, "MMM"),
+        start: startOfMonth(date),
+        end: endOfMonth(date),
+      });
+    }
 
-    const count = recentUsers.filter(
-      (user) => user.createdAt >= monthStart && user.createdAt <= monthEnd
-    ).length;
+    const revenueChartData = await Promise.all(
+      months.map(async (month) => {
+        const monthlyRevenue = await db.transaction.aggregate({
+          where: {
+            status: "SUCCESSFUL",
+            type: { in: ["COMMISSION", "JOB_FEE"] },
+            createdAt: {
+              gte: month.start,
+              lte: month.end,
+            },
+          },
+          _sum: { amount: true },
+        });
+
+        return {
+          name: month.label,
+          revenue: monthlyRevenue._sum.amount || 0,
+        };
+      })
+    );
+
+    const userGrowthData = await Promise.all(
+      months.map(async (month) => {
+        const count = await db.user.count({
+          where: {
+            createdAt: {
+              gte: month.start,
+              lte: month.end,
+            },
+            role: { in: ["TALENT", "EMPLOYER"] },
+          },
+        });
+
+        return {
+          name: month.label,
+          users: count,
+        };
+      })
+    );
+
+    const formattedRevenue = new Intl.NumberFormat("en-NG", {
+      style: "currency",
+      currency: "NGN",
+      minimumFractionDigits: 0,
+    }).format(totalRevenueValue);
 
     return {
-      name: format(month, "MMM"),
-      users: count,
+      stats: {
+        totalUsers,
+        totalJobs,
+        activeJobs,
+        revenue: formattedRevenue,
+      },
+      charts: {
+        userGrowth: userGrowthData,
+        revenue: revenueChartData,
+      },
     };
-  });
-
-  const revenueData = [
-    { name: "Jan", revenue: 120000 },
-    { name: "Feb", revenue: 150000 },
-    { name: "Mar", revenue: 180000 },
-    { name: "Apr", revenue: 220000 },
-    { name: "May", revenue: 250000 },
-    { name: "Jun", revenue: 310000 },
-  ];
-
-  return {
-    stats: {
-      totalUsers,
-      totalJobs,
-      activeJobs,
-      revenue: "NGN 1.2M",
-    },
-    charts: {
-      userGrowth: userGrowthData,
-      revenue: revenueData,
-    },
-  };
+  } catch (error) {
+    console.error("ANALYTICS_ERROR", error);
+    return null;
+  }
 };

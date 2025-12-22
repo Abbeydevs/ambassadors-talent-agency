@@ -86,11 +86,168 @@ model User {
   accounts Account[]
   sessions Session[]
 
+  wallet              Wallet?
+  transactions        Transaction[]    @relation("UserTransactions")
+  payouts             PayoutRequest[]
+
+  coursesOwned        Course[]         @relation("InstructorCourses")
+  enrollments         Enrollment[]
+
+  disputesCreated     Dispute[]        @relation("DisputeCreator")
+  disputesAgainst     Dispute[]        @relation("DisputeTarget")
+
   talentProfile TalentProfile?
 
   employerProfile EmployerProfile?
   activitiesPerformed ActivityLog[] @relation("ActorActivities")
   activitiesReceived  ActivityLog[] @relation("TargetActivities")
+}
+
+model Wallet {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  balance     Float    @default(0.0) 
+  currency    String   @default("NGN")
+  
+  totalEarned Float    @default(0.0)
+  totalSpent  Float    @default(0.0)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Transaction {
+  id              String          @id @default(cuid())
+  userId          String
+  user            User            @relation("UserTransactions", fields: [userId], references: [id])
+  
+  amount          Float
+  currency        String          @default("NGN")
+  type            TransactionType
+  status          TransactionStatus @default(PENDING)
+  
+  reference       String?         @unique // Paystack Reference
+  description     String?
+  
+  // LINKING: Knowing what this money is for
+  jobId           String?
+  applicationId   String?         @unique // One escrow payment per application
+  application     Application?    @relation(fields: [applicationId], references: [id])
+  
+  courseId        String?
+  
+  createdAt       DateTime        @default(now())
+  updatedAt       DateTime        @updatedAt
+}
+
+model Dispute {
+  id              String   @id @default(cuid())
+  applicationId   String   @unique
+  application     Application @relation(fields: [applicationId], references: [id])
+  
+  creatorId       String   // Who started the dispute?
+  creator         User     @relation("DisputeCreator", fields: [creatorId], references: [id])
+  
+  targetId        String   // Who is being reported?
+  target          User     @relation("DisputeTarget", fields: [targetId], references: [id])
+  
+  reason          String   @db.Text
+  adminNotes      String?  @db.Text
+  
+  status          DisputeStatus @default(OPEN)
+  
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model PayoutRequest {
+  id              String        @id @default(cuid())
+  userId          String
+  user            User          @relation(fields: [userId], references: [id])
+  
+  amount          Float
+  currency        String        @default("NGN")
+  status          PayoutStatus  @default(PENDING)
+  
+  bankName        String
+  accountNumber   String
+  accountName     String
+  
+  rejectionReason String?
+  processedAt     DateTime?
+
+  createdAt       DateTime      @default(now())
+  updatedAt       DateTime      @updatedAt
+}
+
+model Course {
+  id           String   @id @default(cuid())
+  title        String
+  description  String   @db.Text
+  thumbnailUrl String?
+  
+  instructorId String
+  instructor   User     @relation("InstructorCourses", fields: [instructorId], references: [id])
+  
+  price        Float    @default(0.0)
+  isPublished  Boolean  @default(false)
+  
+  modules      Module[]
+  enrollments  Enrollment[]
+  
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+}
+
+model Module {
+  id          String   @id @default(cuid())
+  courseId    String
+  course      Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  title       String
+  position    Int
+  lessons     Lesson[]
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Lesson {
+  id            String   @id @default(cuid())
+  moduleId      String
+  module        Module   @relation(fields: [moduleId], references: [id], onDelete: Cascade)
+  title         String
+  videoUrl      String?
+  content       String?  @db.Text
+  position      Int
+  isFreePreview Boolean  @default(false)
+  
+  userProgress  UserProgress[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model Enrollment {
+  id         String   @id @default(cuid())
+  userId     String
+  user       User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  courseId   String
+  course     Course   @relation(fields: [courseId], references: [id], onDelete: Cascade)
+  amountPaid Float    @default(0.0)
+  enrolledAt DateTime @default(now())
+
+  @@unique([userId, courseId])
+}
+
+model UserProgress {
+  id          String   @id @default(cuid())
+  userId      String
+  lessonId    String
+  lesson      Lesson   @relation(fields: [lessonId], references: [id], onDelete: Cascade)
+  isCompleted Boolean  @default(false)
+  updatedAt   DateTime @updatedAt
+  
+  @@unique([userId, lessonId])
 }
 
 model PasswordResetToken {
@@ -313,6 +470,10 @@ model Application {
   status      ApplicationStatus @default(SUBMITTED)
   notes       String?           @db.Text
 
+  markedCompleteAt    DateTime?
+  transaction         Transaction? 
+  dispute             Dispute?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
@@ -410,7 +571,12 @@ enum ApplicationStatus {
   SHORTLISTED
   INTERVIEW
   REJECTED
+  PAYMENT_PENDING
   HIRED
+  JOB_COMPLETED
+  PAID
+  DISPUTED
+  REFUNDED
 }
 
 enum JobStatus {
@@ -420,4 +586,32 @@ enum JobStatus {
   REJECTED
   CLOSED
   ARCHIVED
+}
+
+enum TransactionType {
+  DEPOSIT          
+  WITHDRAWAL       
+  JOB_FEE           
+  COURSE_PURCHASE   
+  COMMISSION       
+  PAYMENT_RELEASED  
+}
+
+enum TransactionStatus {
+  PENDING
+  SUCCESSFUL
+  FAILED
+}
+
+enum PayoutStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  PROCESSED
+}
+
+enum DisputeStatus {
+  OPEN
+  RESOLVED_PAY_TALENT  
+  RESOLVED_REFUND     
 }
