@@ -103,6 +103,27 @@ model User {
   activitiesReceived  ActivityLog[] @relation("TargetActivities")
 }
 
+model SystemSettings {
+  id                String   @id @default("default_settings") 
+  
+  siteName          String   @default("Ambassador Talent Agency")
+  supportEmail      String   @default("support@ambassador.com")
+  maintenanceMode   Boolean  @default(false)
+  
+  facebookUrl       String?
+  instagramUrl      String?
+  twitterUrl        String?
+  linkedinUrl       String?
+
+  termsOfService    String?  @db.Text
+  privacyPolicy     String?  @db.Text
+  cookiePolicy      String?  @db.Text
+
+  emailTemplates    Json?    
+
+  updatedAt         DateTime @updatedAt
+}
+
 model Wallet {
   id          String   @id @default(cuid())
   userId      String   @unique

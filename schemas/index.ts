@@ -246,3 +246,41 @@ export const ApplicationSchema = z.object({
     .optional(),
   attachments: z.array(z.string().url()).optional(),
 });
+
+export const SystemSettingsSchema = z.object({
+  siteName: z.string().min(1, "Site name is required"),
+  supportEmail: z.string().email("Invalid email address"),
+  maintenanceMode: z.boolean(),
+
+  facebookUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  instagramUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  twitterUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+  linkedinUrl: z.string().url("Invalid URL").optional().or(z.literal("")),
+
+  termsOfService: z.string().optional(),
+  privacyPolicy: z.string().optional(),
+  cookiePolicy: z.string().optional(),
+
+  emailTemplates: z
+    .object({
+      welcome: z
+        .object({
+          subject: z.string().min(1, "Subject is required"),
+          body: z.string().min(1, "Body is required"),
+        })
+        .optional(),
+      application_received: z
+        .object({
+          subject: z.string().min(1, "Subject is required"),
+          body: z.string().min(1, "Body is required"),
+        })
+        .optional(),
+      hired: z
+        .object({
+          subject: z.string().min(1, "Subject is required"),
+          body: z.string().min(1, "Body is required"),
+        })
+        .optional(),
+    })
+    .optional(),
+});
