@@ -10,7 +10,6 @@ import {
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { format } from "date-fns";
 import { Loader2, Briefcase, Calendar, UserCheck } from "lucide-react";
 import { getEmployerHiringHistory } from "@/actions/admin/get-hiring-history";
 
@@ -39,6 +38,14 @@ interface HiringHistoryDialogProps {
   companyName: string;
 }
 
+const formatDate = (date: Date) => {
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    year: "numeric",
+  }).format(new Date(date));
+};
+
 export const HiringHistoryDialog = ({
   isOpen,
   onClose,
@@ -64,73 +71,101 @@ export const HiringHistoryDialog = ({
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[600px] bg-white">
+      <DialogContent className="sm:max-w-[700px] bg-white">
         <DialogHeader>
-          <DialogTitle className="flex items-center gap-2">
-            <Briefcase className="h-5 w-5 text-slate-500" />
-            Hiring History: {companyName}
+          <DialogTitle className="text-xl font-semibold text-gray-900 flex items-center gap-2">
+            <div className="h-10 w-10 bg-amber-50 rounded-lg flex items-center justify-center">
+              <Briefcase className="h-5 w-5 text-amber-600" />
+            </div>
+            <div>
+              <p>Hiring History</p>
+              <p className="text-sm font-normal text-gray-500 mt-0.5">
+                {companyName}
+              </p>
+            </div>
           </DialogTitle>
         </DialogHeader>
 
-        <ScrollArea className="h-[400px] pr-4">
+        <ScrollArea className="h-[500px] pr-4 mt-4">
           {loading ? (
             <div className="flex h-full items-center justify-center pt-20">
-              <Loader2 className="h-8 w-8 animate-spin text-slate-400" />
+              <Loader2 className="h-8 w-8 animate-spin text-blue-600" />
             </div>
           ) : jobs.length === 0 ? (
-            <div className="text-center text-slate-500 pt-20">
-              No jobs posted by this company yet.
+            <div className="text-center pt-20 pb-10">
+              <div className="h-16 w-16 bg-gray-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <Briefcase className="h-8 w-8 text-gray-400" />
+              </div>
+              <p className="text-gray-900 font-medium mb-1">
+                No jobs posted yet
+              </p>
+              <p className="text-sm text-gray-500">
+                This company hasn&apos;t posted any jobs
+              </p>
             </div>
           ) : (
-            <div className="space-y-4 mt-2">
+            <div className="space-y-4">
               {jobs.map((job) => (
-                <div key={job.id} className="border rounded-lg p-4 bg-slate-50">
+                <div
+                  key={job.id}
+                  className="border border-gray-200 rounded-xl p-5 bg-linear-to-br from-gray-50 to-white hover:shadow-md transition-shadow"
+                >
                   {/* Job Header */}
-                  <div className="flex items-start justify-between mb-3">
-                    <div>
-                      <h4 className="font-semibold text-slate-900">
+                  <div className="flex items-start justify-between mb-4">
+                    <div className="flex-1">
+                      <h4 className="font-semibold text-gray-900 text-lg mb-2">
                         {job.title}
                       </h4>
-                      <div className="flex items-center gap-2 text-xs text-slate-500 mt-1">
-                        <Calendar className="h-3 w-3" />
-                        Posted {format(new Date(job.createdAt), "MMM d, yyyy")}
+                      <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <Calendar className="h-3.5 w-3.5" />
+                        Posted {formatDate(job.createdAt)}
                       </div>
                     </div>
                     <Badge
                       variant={
                         job.status === "PUBLISHED" ? "default" : "secondary"
                       }
+                      className={
+                        job.status === "PUBLISHED"
+                          ? "bg-green-100 text-green-700 hover:bg-green-100 border-green-200"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-100"
+                      }
                     >
                       {job.status}
                     </Badge>
                   </div>
 
-                  <div className="bg-white rounded border p-3">
-                    <h5 className="text-xs font-semibold text-slate-500 uppercase mb-2 flex items-center gap-1">
-                      <UserCheck className="h-3 w-3" />
+                  {/* Hired Talents Section */}
+                  <div className="bg-white rounded-lg border border-gray-200 p-4">
+                    <h5 className="text-xs font-semibold text-gray-500 uppercase mb-3 flex items-center gap-2">
+                      <UserCheck className="h-4 w-4 text-blue-600" />
                       Hired Talent ({job.applications.length})
                     </h5>
 
                     {job.applications.length === 0 ? (
-                      <p className="text-sm text-slate-400 italic">
-                        No hires recorded yet.
+                      <p className="text-sm text-gray-400 italic py-2">
+                        No hires recorded yet
                       </p>
                     ) : (
-                      <div className="flex flex-col gap-2">
+                      <div className="space-y-2">
                         {job.applications.map((app, idx) => (
                           <div
                             key={idx}
-                            className="flex items-center gap-3 p-2 hover:bg-slate-50 rounded transition-colors"
+                            className="flex items-center gap-3 p-3 hover:bg-blue-50 rounded-lg transition-colors border border-transparent hover:border-blue-100"
                           >
-                            <Avatar className="h-8 w-8">
+                            <Avatar className="h-10 w-10 border-2 border-white ring-2 ring-gray-100">
                               <AvatarImage src={app.talent.user.image || ""} />
-                              <AvatarFallback>T</AvatarFallback>
+                              <AvatarFallback className="bg-linear-to-br from-blue-500 to-blue-600 text-white font-semibold text-sm">
+                                {app.talent.user.name
+                                  ?.charAt(0)
+                                  ?.toUpperCase() || "T"}
+                              </AvatarFallback>
                             </Avatar>
-                            <div className="text-sm">
-                              <p className="font-medium text-slate-900">
+                            <div className="flex-1">
+                              <p className="font-semibold text-sm text-gray-900">
                                 {app.talent.user.name || "Unknown Talent"}
                               </p>
-                              <p className="text-xs text-slate-500">
+                              <p className="text-xs text-gray-500">
                                 {app.talent.user.email}
                               </p>
                             </div>
