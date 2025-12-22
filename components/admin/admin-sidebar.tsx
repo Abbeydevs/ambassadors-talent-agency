@@ -11,6 +11,8 @@ import {
   CreditCard,
   Settings,
   LogOut,
+  Headset,
+  ShieldAlert,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -35,15 +37,26 @@ const routes = [
     icon: ShieldCheck,
     href: "/admin/jobs",
   },
+
   {
     label: "Finance",
     icon: CreditCard,
     href: "/admin/finance",
   },
   {
+    label: "Moderation",
+    icon: ShieldAlert,
+    href: "/admin/moderation",
+  },
+  {
     label: "Communications",
     icon: Users,
     href: "/admin/communications",
+  },
+  {
+    label: "Support",
+    icon: Headset,
+    href: "/admin/support",
   },
   {
     label: "Settings",

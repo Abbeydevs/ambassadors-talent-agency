@@ -11,7 +11,6 @@ export default async function CommunicationsPage() {
   const session = await auth();
   if (session?.user?.role !== "ADMIN") return redirect("/");
 
-  // Fetch history (Server Side)
   const historyData = await getAnnouncementHistory();
   const history = historyData.success || [];
 
@@ -27,12 +26,10 @@ export default async function CommunicationsPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Left Column: The Form (1/3 width on large screens) */}
         <div className="lg:col-span-1">
           <AnnouncementForm />
         </div>
 
-        {/* Right Column: The History (2/3 width) */}
         <div className="lg:col-span-2">
           <Card>
             <CardHeader className="pb-3">

@@ -278,12 +278,12 @@ export const TalentsTable = ({ talents }: TalentsTableProps) => {
                           >
                             {talent.isSuspended ? (
                               <>
-                                <CheckCircle className="mr-2 h-4 w-4" />{" "}
-                                Activate Account
+                                <CheckCircle className="h-4 w-4" /> Activate
+                                Account
                               </>
                             ) : (
                               <>
-                                <Ban className="mr-2 h-4 w-4" /> Suspend Account
+                                <Ban className="h-4 w-4" /> Suspend Account
                               </>
                             )}
                           </DropdownMenuItem>

@@ -1,4 +1,9 @@
-import { AvailabilityStatus, Gender, ProfileVisibility } from "@prisma/client";
+import {
+  AvailabilityStatus,
+  Gender,
+  ProfileVisibility,
+  ReportReason,
+} from "@prisma/client";
 import * as z from "zod";
 
 export const RegisterSchema = z.object({
@@ -290,4 +295,20 @@ export const AnnouncementSchema = z.object({
   message: z.string().min(10, "Message must be at least 10 characters"),
   audience: z.enum(["ALL", "TALENT", "EMPLOYER"]),
   sendAsEmail: z.boolean(),
+});
+
+export const TicketSchema = z.object({
+  subject: z.string().min(1, "Subject is required"),
+  message: z.string().min(10, "Please describe your issue in detail"),
+  priority: z.enum(["LOW", "MEDIUM", "HIGH", "URGENT"]),
+});
+
+export const ReportSchema = z.object({
+  reason: z.nativeEnum(ReportReason),
+  details: z
+    .string()
+    .max(500, "Details must be less than 500 characters")
+    .optional(),
+  targetId: z.string().min(1),
+  type: z.enum(["JOB", "USER"]),
 });

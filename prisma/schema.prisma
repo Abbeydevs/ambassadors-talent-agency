@@ -97,12 +97,36 @@ model User {
   disputesAgainst     Dispute[]        @relation("DisputeTarget")
 
   talentProfile TalentProfile?
+  tickets             Ticket[]
+  reportsMade         Report[]  @relation("Reporter")
+  reportsReceived     Report[]  @relation("ReportedUser")
 
   employerProfile EmployerProfile?
   activitiesPerformed ActivityLog[] @relation("ActorActivities")
   activitiesReceived  ActivityLog[] @relation("TargetActivities")
   notifications       Notification[]
   createdAnnouncements Announcement[] @relation("CreatedAnnouncements")
+}
+
+model Ticket {
+  id          String   @id @default(cuid())
+  
+  subject     String
+  message     String   @db.Text  // The user's issue
+  
+  // Tracking fields
+  status      TicketStatus   @default(OPEN)
+  priority    TicketPriority @default(MEDIUM)
+  
+  // Who sent it?
+  userId      String
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  // Admin internal notes (optional)
+  adminNotes  String?  @db.Text
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model Announcement {
@@ -479,6 +503,7 @@ model Job {
   projectType String
   duration    String?
   startDate   DateTime?
+  reports             Report[]
 
   isPaid          Boolean   @default(true)
   salaryMin       Int?
@@ -498,6 +523,28 @@ model Job {
   savedBy   SavedJob[]
 
   @@index([employerId])
+}
+
+model Report {
+  id          String   @id @default(cuid())
+  
+  reason      ReportReason
+  details     String?  @db.Text
+  status      ReportStatus @default(PENDING)
+
+  // Who sent the report?
+  reporterId  String
+  reporter    User     @relation("Reporter", fields: [reporterId], references: [id])
+
+  // What did they report? (Nullable fields: A report targets EITHER a Job OR a User)
+  targetJobId String?
+  targetJob   Job?     @relation(fields: [targetJobId], references: [id])
+
+  targetUserId String?
+  targetUser   User?   @relation("ReportedUser", fields: [targetUserId], references: [id])
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 
 model SavedJob {
@@ -684,4 +731,33 @@ enum NotificationType {
   JOB
   PAYMENT
   SECURITY
+}
+
+enum TicketStatus {
+  OPEN
+  IN_PROGRESS
+  RESOLVED
+  CLOSED
+}
+
+enum TicketPriority {
+  LOW
+  MEDIUM
+  HIGH
+  URGENT
+}
+
+enum ReportReason {
+  SCAM
+  SPAM
+  INAPPROPRIATE
+  HARASSMENT
+  OFFENSIVE_CONTENT
+  OTHER
+}
+
+enum ReportStatus {
+  PENDING
+  RESOLVED
+  DISMISSED
 }
