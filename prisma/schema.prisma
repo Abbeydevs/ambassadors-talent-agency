@@ -415,7 +415,9 @@ enum ApplicationStatus {
 
 enum JobStatus {
   DRAFT
+  PENDING
   PUBLISHED
+  REJECTED
   CLOSED
   ARCHIVED
 }
