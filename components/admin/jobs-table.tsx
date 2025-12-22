@@ -12,7 +12,7 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, MoreHorizontal, Briefcase } from "lucide-react";
+import { Search, MoreHorizontal, Briefcase, Pencil } from "lucide-react";
 import { format } from "date-fns";
 import {
   DropdownMenu,
@@ -21,6 +21,7 @@ import {
   DropdownMenuLabel,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { EditJobDialog } from "./edit-job-dialog";
 
 interface JobWithEmployer {
   id: string;
@@ -28,6 +29,9 @@ interface JobWithEmployer {
   status: string;
   createdAt: Date;
   location: string;
+  description: string;
+  salaryMin?: number | null;
+  salaryMax?: number | null;
   employer: {
     user: {
       name: string | null;
@@ -46,8 +50,8 @@ interface JobsTableProps {
 
 export const JobsTable = ({ jobs }: JobsTableProps) => {
   const [search, setSearch] = useState("");
+  const [editingJob, setEditingJob] = useState<JobWithEmployer | null>(null);
 
-  // Simple client-side search
   const filteredJobs = jobs.filter(
     (job) =>
       job.title.toLowerCase().includes(search.toLowerCase()) ||
@@ -83,7 +87,20 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
 
   return (
     <div className="space-y-4">
-      {/* Search Bar */}
+      {editingJob && (
+        <EditJobDialog
+          isOpen={!!editingJob}
+          onClose={() => setEditingJob(null)}
+          job={{
+            id: editingJob.id,
+            title: editingJob.title,
+            description: editingJob.description || "",
+            location: editingJob.location,
+            salaryMin: editingJob.salaryMin,
+            salaryMax: editingJob.salaryMax,
+          }}
+        />
+      )}
       <div className="flex items-center gap-2 max-w-sm">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -96,7 +113,6 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
         </div>
       </div>
 
-      {/* Table */}
       <div className="rounded-md border bg-white">
         <Table>
           <TableHeader>
@@ -161,6 +177,9 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
                       </DropdownMenuTrigger>
                       <DropdownMenuContent align="end">
                         <DropdownMenuLabel>Actions</DropdownMenuLabel>
+                        <DropdownMenuItem onClick={() => setEditingJob(job)}>
+                          <Pencil className="h-4 w-4" /> Edit Content
+                        </DropdownMenuItem>
                         <DropdownMenuItem>View Details</DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
