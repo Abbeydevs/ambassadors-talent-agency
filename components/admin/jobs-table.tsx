@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import { Input } from "@/components/ui/input";
 import {
   Table,
@@ -12,16 +12,37 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { Search, MoreHorizontal, Briefcase, Pencil } from "lucide-react";
+import {
+  Search,
+  MoreHorizontal,
+  Briefcase,
+  Pencil,
+  Trash,
+  Eye,
+  Loader2,
+} from "lucide-react";
 import { format } from "date-fns";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
+  DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { EditJobDialog } from "./edit-job-dialog";
+import { deleteJob } from "@/actions/admin/delete-job";
+import { toast } from "sonner";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "../ui/alert-dialog";
 
 interface JobWithEmployer {
   id: string;
@@ -51,6 +72,8 @@ interface JobsTableProps {
 export const JobsTable = ({ jobs }: JobsTableProps) => {
   const [search, setSearch] = useState("");
   const [editingJob, setEditingJob] = useState<JobWithEmployer | null>(null);
+  const [isPending, startTransition] = useTransition();
+  const [jobToDelete, setJobToDelete] = useState<string | null>(null);
 
   const filteredJobs = jobs.filter(
     (job) =>
@@ -59,6 +82,23 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
         ?.toLowerCase()
         .includes(search.toLowerCase())
   );
+
+  const executeDelete = () => {
+    if (!jobToDelete) return;
+
+    startTransition(() => {
+      deleteJob(jobToDelete)
+        .then((data) => {
+          if (data.error) {
+            toast.error(data.error);
+          } else {
+            toast.success(data.success);
+            setJobToDelete(null);
+          }
+        })
+        .catch(() => toast.error("Something went wrong"));
+    });
+  };
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -101,6 +141,35 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
           }}
         />
       )}
+
+      <AlertDialog
+        open={!!jobToDelete}
+        onOpenChange={() => setJobToDelete(null)}
+      >
+        <AlertDialogContent className="bg-white">
+          <AlertDialogHeader>
+            <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete the job
+              posting and remove all associated data from our servers.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={(e) => {
+                e.preventDefault();
+                executeDelete();
+              }}
+              disabled={isPending}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600 text-white"
+            >
+              {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+              Delete Job
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <div className="flex items-center gap-2 max-w-sm">
         <div className="relative flex-1">
           <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
@@ -180,7 +249,17 @@ export const JobsTable = ({ jobs }: JobsTableProps) => {
                         <DropdownMenuItem onClick={() => setEditingJob(job)}>
                           <Pencil className="h-4 w-4" /> Edit Content
                         </DropdownMenuItem>
-                        <DropdownMenuItem>View Details</DropdownMenuItem>
+                        <DropdownMenuItem>
+                          <Eye className="h-4 w-4" />
+                          View Details
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
+                        <DropdownMenuItem
+                          onClick={() => setJobToDelete(job.id)}
+                          className="text-red-600 focus:text-red-600 focus:bg-red-50"
+                        >
+                          <Trash className="h-4 w-4" /> Delete Job
+                        </DropdownMenuItem>
                       </DropdownMenuContent>
                     </DropdownMenu>
                   </TableCell>
