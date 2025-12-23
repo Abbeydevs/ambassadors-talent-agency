@@ -7,12 +7,14 @@ import { ImagePlus, Trash, Loader2 } from "lucide-react";
 import { getCloudinarySignature } from "@/actions/get-signature";
 import { toast } from "sonner";
 import { Input } from "./input";
+import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
   disabled?: boolean;
   onChange: (value: string) => void;
   onRemove: (value: string) => void;
   value: string;
+  variant?: "avatar" | "cover";
 }
 
 export const ImageUpload = ({
@@ -20,6 +22,7 @@ export const ImageUpload = ({
   onChange,
   onRemove,
   value,
+  variant = "avatar",
 }: ImageUploadProps) => {
   const [isLoading, setIsLoading] = useState(false);
 
@@ -68,13 +71,26 @@ export const ImageUpload = ({
   };
 
   return (
-    <div className="flex flex-col items-center justify-center gap-4">
-      <div className="relative h-40 w-40 rounded-full overflow-hidden border-4 border-white/20 shadow-xl bg-slate-100">
+    <div
+      className={cn(
+        "flex flex-col gap-4",
+        variant === "avatar" ? "items-center justify-center" : "items-start"
+      )}
+    >
+      {/* 1. The Container (Circle vs Rectangle) */}
+      <div
+        className={cn(
+          "relative overflow-hidden border-4 border-white/20 shadow-xl bg-slate-100",
+          variant === "avatar"
+            ? "h-40 w-40 rounded-full"
+            : "w-full aspect-video rounded-lg max-h-[300px] object-cover"
+        )}
+      >
         {value ? (
           <div className="relative h-full w-full">
             <img
               src={value}
-              alt="Profile"
+              alt="Upload"
               className="object-cover w-full h-full"
             />
             <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
@@ -108,7 +124,11 @@ export const ImageUpload = ({
           onClick={() => document.getElementById("imageInput")?.click()}
           className="bg-white/10 border-white/20 hover:bg-white/20 text-slate-900"
         >
-          {isLoading ? "Uploading..." : "Change Photo"}
+          {isLoading
+            ? "Uploading..."
+            : variant === "avatar"
+            ? "Change Photo"
+            : "Upload Cover Image"}
         </Button>
         <Input
           id="imageInput"

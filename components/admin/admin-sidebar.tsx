@@ -12,6 +12,7 @@ import {
   LogOut,
   Headset,
   ShieldAlert,
+  AppWindowMac,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -35,6 +36,11 @@ const routes = [
     label: "Jobs",
     icon: ShieldCheck,
     href: "/admin/jobs",
+  },
+  {
+    icon: AppWindowMac,
+    label: "Blog",
+    href: "/admin/blog",
   },
   {
     label: "Finance",

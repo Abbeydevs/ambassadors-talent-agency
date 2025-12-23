@@ -317,3 +317,23 @@ export const CommentSchema = z.object({
   content: z.string().min(1, "Comment cannot be empty"),
   postId: z.string().min(1),
 });
+
+export const BlogPostSchema = z.object({
+  title: z.string().min(1, "Title is required"),
+  slug: z.string().optional(),
+  content: z.string().min(1, "Content is required"),
+  excerpt: z.string().optional(),
+  coverImage: z.string().optional(),
+
+  categoryId: z.string().optional(),
+
+  metaTitle: z.string().optional(),
+  metaDescription: z.string().optional(),
+
+  isPublished: z.boolean(),
+});
+
+export const CategorySchema = z.object({
+  name: z.string().min(1, "Name is required"),
+  description: z.string().optional(),
+});
