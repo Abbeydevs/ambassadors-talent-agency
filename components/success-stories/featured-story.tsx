@@ -27,6 +27,7 @@ export default function FeaturedStory({ story }: FeaturedStoryProps) {
           fill
           className="object-cover transition-transform duration-700 group-hover:scale-105"
           priority
+          unoptimized
         />
       ) : (
         <div className="w-full h-full bg-slate-800" />
@@ -36,7 +37,6 @@ export default function FeaturedStory({ story }: FeaturedStoryProps) {
 
       {/* Content Overlay */}
       <div className="absolute bottom-0 left-0 w-full p-8 md:p-16 flex flex-col items-start text-white max-w-4xl">
-        {/* Badge [cite: 1795] */}
         <div className="flex items-center gap-2 bg-amber-500 text-white px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wider mb-6">
           <Star className="w-4 h-4 fill-current" />
           Featured Story

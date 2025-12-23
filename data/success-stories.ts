@@ -4,18 +4,25 @@ export const getAllSuccessStories = async (category?: string) => {
   try {
     const stories = await db.successStory.findMany({
       where: {
+        isPublished: true,
         ...(category && category !== "All" ? { category } : {}),
       },
-      orderBy: { createdAt: "desc" },
+      orderBy: {
+        createdAt: "desc",
+      },
       include: {
         talent: {
-          select: { name: true, image: true },
+          select: {
+            name: true,
+            image: true,
+          },
         },
       },
     });
+
     return stories;
   } catch (error) {
-    console.error("Error fetching success stories:", error);
+    console.error("Error fetching all success stories:", error);
     return [];
   }
 };
@@ -23,7 +30,9 @@ export const getAllSuccessStories = async (category?: string) => {
 export const getSuccessStoryBySlug = async (slug: string) => {
   try {
     const story = await db.successStory.findUnique({
-      where: { slug },
+      where: {
+        slug,
+      },
       include: {
         talent: {
           select: {
@@ -41,7 +50,7 @@ export const getSuccessStoryBySlug = async (slug: string) => {
     });
     return story;
   } catch (error) {
-    console.error("Error fetching success story by slug:", error);
+    console.error("Error fetching story by slug:", error);
     return null;
   }
 };
@@ -50,6 +59,7 @@ export const getRelatedStories = async (currentId: string) => {
   try {
     const stories = await db.successStory.findMany({
       where: {
+        isPublished: true,
         id: { not: currentId },
       },
       take: 3,
@@ -57,7 +67,7 @@ export const getRelatedStories = async (currentId: string) => {
     });
     return stories;
   } catch (error) {
-    console.error("Error fetching related success stories:", error);
+    console.error("Error fetching related stories:", error);
     return [];
   }
 };
@@ -65,7 +75,10 @@ export const getRelatedStories = async (currentId: string) => {
 export const getFeaturedStory = async () => {
   try {
     const story = await db.successStory.findFirst({
-      where: { featured: true },
+      where: {
+        featured: true,
+        isPublished: true,
+      },
       include: {
         talent: {
           select: { name: true, image: true },
@@ -74,7 +87,7 @@ export const getFeaturedStory = async () => {
     });
     return story;
   } catch (error) {
-    console.error("Error fetching featured success story:", error);
+    console.error("Error fetching featured story:", error);
     return null;
   }
 };
@@ -97,7 +110,19 @@ export const getAdminStories = async () => {
     });
     return stories;
   } catch (error) {
-    console.error("Error fetching admin success stories:", error);
+    console.error("Error fetching admin stories:", error);
     return [];
+  }
+};
+
+export const getSuccessStoryById = async (id: string) => {
+  try {
+    const story = await db.successStory.findUnique({
+      where: { id },
+    });
+    return story;
+  } catch (error) {
+    console.error("Error fetching story by ID:", error);
+    return null;
   }
 };

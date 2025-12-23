@@ -61,6 +61,7 @@ export default async function SuccessStoryDetailPage({ params }: PageProps) {
                 alt={story.talent?.name || "Talent"}
                 fill
                 className="rounded-full object-cover border-4 border-white shadow-lg"
+                unoptimized
               />
             </div>
             <h2 className="text-2xl font-bold text-slate-900 mb-1">
@@ -128,6 +129,7 @@ export default async function SuccessStoryDetailPage({ params }: PageProps) {
                       alt={related.title}
                       fill
                       className="object-cover group-hover:scale-105 transition-transform duration-500"
+                      unoptimized
                     />
                   )}
                   <div className="absolute inset-0 bg-black/20 group-hover:bg-transparent transition-colors" />

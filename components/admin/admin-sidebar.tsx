@@ -14,6 +14,7 @@ import {
   ShieldAlert,
   AppWindowMac,
   MessageSquare,
+  Star,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -42,6 +43,11 @@ const routes = [
     icon: AppWindowMac,
     label: "Blog",
     href: "/admin/blog",
+  },
+  {
+    label: "Success Stories",
+    icon: Star,
+    href: "/admin/success-stories",
   },
   {
     label: "Comments",

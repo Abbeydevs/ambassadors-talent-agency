@@ -68,6 +68,7 @@ export default async function SuccessStoriesPage({ searchParams }: PageProps) {
                             alt={story.title}
                             fill
                             className="object-cover transition-transform duration-500 group-hover:scale-105"
+                            unoptimized
                           />
                         ) : (
                           <div className="w-full h-full bg-slate-200 flex items-center justify-center">

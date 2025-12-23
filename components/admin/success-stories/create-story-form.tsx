@@ -6,7 +6,9 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { SuccessStorySchema } from "@/schemas";
 import { createSuccessStory } from "@/actions/admin/create-story";
+import { updateSuccessStory } from "@/actions/admin/update-story";
 import { ImageUpload } from "@/components/ui/image-upload";
+import { SuccessStory } from "@prisma/client";
 
 import {
   Form,
@@ -31,54 +33,72 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 import { useRouter } from "next/navigation";
 
-interface CreateStoryFormProps {
+interface StoryFormProps {
   talents: { id: string; name: string | null; email: string }[];
+  initialData?: SuccessStory | null; // Optional initial data for editing
 }
 
-export default function CreateStoryForm({ talents }: CreateStoryFormProps) {
+export default function CreateStoryForm({
+  talents,
+  initialData,
+}: StoryFormProps) {
   const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const form = useForm<z.infer<typeof SuccessStorySchema>>({
     resolver: zodResolver(SuccessStorySchema),
     defaultValues: {
-      title: "",
-      slug: "",
-      excerpt: "",
-      content: "",
-      category: "",
-      coverImage: "",
-      talentId: "",
-      featured: false,
-      isPublished: false,
+      title: initialData?.title || "",
+      slug: initialData?.slug || "",
+      excerpt: initialData?.excerpt || "",
+      content: initialData?.content || "",
+      category: initialData?.category || "",
+      coverImage: initialData?.coverImage || "",
+      talentId: initialData?.talentId || "", // This might be null in DB, handle carefully
+      featured: initialData?.featured || false,
+      isPublished: initialData?.isPublished || false,
     },
   });
 
   const onSubmit = (values: z.infer<typeof SuccessStorySchema>) => {
     startTransition(() => {
-      createSuccessStory(values)
-        .then((data) => {
-          if (data.error) {
-            toast.error(data.error);
-          }
+      if (initialData) {
+        // EDIT MODE
+        updateSuccessStory(values, initialData.id).then((data) => {
+          if (data.error) toast.error(data.error);
           if (data.success) {
             toast.success(data.success);
-            router.push("/success-stories");
+            router.push("/admin/success-stories");
             router.refresh();
           }
-        })
-        .catch(() => toast.error("Something went wrong!"));
+        });
+      } else {
+        // CREATE MODE
+        createSuccessStory(values).then((data) => {
+          if (data.error) toast.error(data.error);
+          if (data.success) {
+            toast.success(data.success);
+            router.push("/admin/success-stories"); // Redirect to list
+            router.refresh();
+          }
+        });
+      }
     });
   };
 
   const generateSlug = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value;
-    form.setValue("title", value);
-    const slug = value
-      .toLowerCase()
-      .replace(/\s+/g, "-")
-      .replace(/[^\w-]+/g, "");
-    form.setValue("slug", slug);
+    // Only auto-generate slug in create mode to avoid accidental URL changes in edit
+    if (!initialData) {
+      const value = e.target.value;
+      form.setValue("title", value);
+      const slug = value
+        .toLowerCase()
+        .replace(/\s+/g, "-")
+        .replace(/[^\w-]+/g, "");
+      form.setValue("slug", slug);
+    } else {
+      form.setValue("title", e.target.value);
+    }
   };
 
   return (
@@ -160,7 +180,7 @@ export default function CreateStoryForm({ talents }: CreateStoryFormProps) {
                 <FormLabel>Select Talent</FormLabel>
                 <Select
                   onValueChange={field.onChange}
-                  defaultValue={field.value}
+                  defaultValue={field.value || undefined}
                   disabled={isPending}
                 >
                   <FormControl>
@@ -294,7 +314,11 @@ export default function CreateStoryForm({ talents }: CreateStoryFormProps) {
         </div>
 
         <Button type="submit" disabled={isPending} className="w-full">
-          {isPending ? "Creating Story..." : "Create Success Story"}
+          {isPending
+            ? "Saving..."
+            : initialData
+            ? "Update Success Story"
+            : "Create Success Story"}
         </Button>
       </form>
     </Form>
