@@ -337,3 +337,19 @@ export const CategorySchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
 });
+
+export const SuccessStorySchema = z.object({
+  title: z.string().min(1, { message: "Title is required" }),
+  slug: z.string().min(1, { message: "Slug is required" }),
+  excerpt: z
+    .string()
+    .min(10, { message: "Excerpt must be at least 10 characters" }),
+  content: z
+    .string()
+    .min(50, { message: "Story content must be at least 50 characters" }),
+  category: z.string().min(1, { message: "Category is required" }),
+  coverImage: z.string().min(1, { message: "Cover image is required" }),
+  talentId: z.string().min(1, { message: "You must select a talent" }),
+  featured: z.boolean(),
+  isPublished: z.boolean(),
+});

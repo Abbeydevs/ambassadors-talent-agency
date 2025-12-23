@@ -77,7 +77,6 @@ export const ImageUpload = ({
         variant === "avatar" ? "items-center justify-center" : "items-start"
       )}
     >
-      {/* 1. The Container (Circle vs Rectangle) */}
       <div
         className={cn(
           "relative overflow-hidden border-4 border-white/20 shadow-xl bg-slate-100",

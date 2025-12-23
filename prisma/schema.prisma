@@ -187,6 +187,7 @@ model SuccessStory {
   
   talentId       String?
   talent         User?    @relation(fields: [talentId], references: [id])
+  isPublished Boolean @default(false)
   
   createdAt      DateTime @default(now())
   updatedAt      DateTime @updatedAt

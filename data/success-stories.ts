@@ -78,3 +78,26 @@ export const getFeaturedStory = async () => {
     return null;
   }
 };
+
+export const getAdminStories = async () => {
+  try {
+    const stories = await db.successStory.findMany({
+      orderBy: {
+        createdAt: "desc",
+      },
+      include: {
+        talent: {
+          select: {
+            name: true,
+            email: true,
+            image: true,
+          },
+        },
+      },
+    });
+    return stories;
+  } catch (error) {
+    console.error("Error fetching admin success stories:", error);
+    return [];
+  }
+};
