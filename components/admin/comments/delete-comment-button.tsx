@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { deleteBlogPost } from "@/actions/admin/blog";
+import { deleteComment } from "@/actions/admin/comments";
 import { Button } from "@/components/ui/button";
 import { Trash2, Loader2 } from "lucide-react";
 import { toast } from "sonner";
@@ -18,20 +18,20 @@ import {
 } from "@/components/ui/alert-dialog";
 
 interface Props {
-  postId: string;
+  commentId: string;
 }
 
-export const DeletePostButton = ({ postId }: Props) => {
+export const DeleteCommentButton = ({ commentId }: Props) => {
   const [isPending, startTransition] = useTransition();
 
   const onDelete = () => {
     startTransition(() => {
-      deleteBlogPost(postId)
+      deleteComment(commentId)
         .then((data) => {
           if (data.error) {
             toast.error(data.error);
           } else {
-            toast.success("Post deleted");
+            toast.success("Comment deleted");
           }
         })
         .catch(() => toast.error("Failed to delete"));
@@ -57,10 +57,10 @@ export const DeletePostButton = ({ postId }: Props) => {
 
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete this article?</AlertDialogTitle>
+          <AlertDialogTitle>Are you absolutely sure?</AlertDialogTitle>
           <AlertDialogDescription>
-            This will permanently delete the post and all its comments. This
-            action cannot be undone.
+            This action cannot be undone. This will permanently delete the
+            user&apos;s comment from the article.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
@@ -69,7 +69,7 @@ export const DeletePostButton = ({ postId }: Props) => {
             onClick={onDelete}
             className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
           >
-            Delete Post
+            Delete Comment
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
