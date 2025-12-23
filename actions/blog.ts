@@ -21,7 +21,7 @@ export const getBlogPosts = async (term?: string, categorySlug?: string) => {
       include: {
         category: true,
         author: {
-          select: { name: true, image: true },
+          select: { id: true, name: true, image: true },
         },
       },
       orderBy: {
@@ -46,7 +46,7 @@ export const getBlogPost = async (slug: string) => {
       include: {
         category: true,
         author: {
-          select: { name: true, image: true, role: true },
+          select: { id: true, name: true, image: true, role: true },
         },
       },
     });

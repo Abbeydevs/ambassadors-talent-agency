@@ -64,6 +64,7 @@ export const upsertBlogPost = async (
     metaTitle,
     metaDescription,
     authorId,
+    customByline,
   } = validated.data;
 
   const slug = generateSlug(title);
@@ -83,6 +84,7 @@ export const upsertBlogPost = async (
           metaDescription,
           slug,
           authorId,
+          customByline,
         },
       });
       revalidatePath(`/blog/${slug}`);
@@ -103,8 +105,9 @@ export const upsertBlogPost = async (
           isPublished,
           metaTitle,
           metaDescription,
-          authorId: session.user.id!,
+          authorId: authorId,
           publishedAt: isPublished ? new Date() : null,
+          customByline,
         },
       });
     }

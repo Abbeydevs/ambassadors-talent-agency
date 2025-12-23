@@ -11,12 +11,9 @@ import { toast } from "sonner";
 import dynamic from "next/dynamic";
 import { BlogPost } from "@prisma/client";
 
-// Import CSS and New Quill
 import "react-quill-new/dist/quill.snow.css";
 const ReactQuill = dynamic(() => import("react-quill-new"), { ssr: false });
 
-// 👇 IMPORT YOUR IMAGE UPLOAD COMPONENT
-// (Adjust path if yours is different, e.g. "@/components/image-upload")
 import { ImageUpload } from "@/components/ui/image-upload";
 
 import {
@@ -89,6 +86,7 @@ export const PostForm = ({
       metaTitle: initialData?.metaTitle || "",
       metaDescription: initialData?.metaDescription || "",
       authorId: initialData?.authorId || authors[0]?.id || "",
+      customByline: initialData?.customByline || "",
     },
   });
 
@@ -301,6 +299,34 @@ export const PostForm = ({
                           ))}
                         </SelectContent>
                       </Select>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+
+                <div className="relative flex items-center py-5">
+                  <span className="w-full border-t" />
+                  <span className="absolute left-1/2 -translate-x-1/2 bg-white px-2 text-xs text-muted-foreground uppercase">
+                    OR
+                  </span>
+                </div>
+
+                <FormField
+                  control={form.control}
+                  name="customByline"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Custom Byline (Guest)</FormLabel>
+                      <FormControl>
+                        <Input
+                          placeholder="e.g. Guest Contributor: John Smith"
+                          {...field}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        If filled, this text will appear instead of the user
+                        profile.
+                      </FormDescription>
                       <FormMessage />
                     </FormItem>
                   )}

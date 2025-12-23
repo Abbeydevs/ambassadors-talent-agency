@@ -3,7 +3,6 @@ import { notFound } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
-import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { ChevronLeft } from "lucide-react";
 import { getComments } from "@/actions/comments";
@@ -45,33 +44,51 @@ export default async function BlogPostPage({ params }: Props) {
             Back to Blog
           </Link>
 
-          <div className="flex items-center gap-3 mb-4">
-            {post.category && (
-              <Badge className="bg-blue-600 hover:bg-blue-700">
-                {post.category.name}
-              </Badge>
-            )}
-            <span className="text-sm text-slate-500">
-              {format(new Date(post.createdAt), "MMMM d, yyyy")}
-            </span>
-          </div>
-
           <h1 className="text-3xl md:text-5xl font-extrabold text-slate-900 leading-tight mb-6">
             {post.title}
           </h1>
 
-          <div className="flex items-center gap-3 border-t pt-6">
-            <Avatar className="h-10 w-10 border">
-              <AvatarImage src={post.author.image || ""} />
-              <AvatarFallback>{post.author.name?.[0] || "A"}</AvatarFallback>
-            </Avatar>
-            <div>
-              <p className="text-sm font-semibold text-slate-900">
-                {post.author.name}
-              </p>
-              <p className="text-xs text-slate-500">{post.author.role}</p>
+          {post.customByline ? (
+            <div className="flex items-center gap-3">
+              <div className="h-10 w-10 rounded-full bg-slate-100 flex items-center justify-center">
+                <span className="text-slate-500 font-semibold text-xs">
+                  Guest
+                </span>
+              </div>
+              <div>
+                <p className="font-medium text-slate-900">
+                  {post.customByline}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {format(
+                    new Date(post.publishedAt || post.createdAt),
+                    "MMMM d, yyyy"
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
+          ) : (
+            <Link
+              href={`/authors/${post.author.id}`}
+              className="flex items-center gap-3 group"
+            >
+              <Avatar className="h-10 w-10 border group-hover:border-blue-500 transition-colors">
+                <AvatarImage src={post.author.image || ""} />
+                <AvatarFallback>{post.author.name?.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors">
+                  {post.author.name}
+                </p>
+                <p className="text-sm text-slate-500">
+                  {format(
+                    new Date(post.publishedAt || post.createdAt),
+                    "MMMM d, yyyy"
+                  )}
+                </p>
+              </div>
+            </Link>
+          )}
         </div>
       </div>
 

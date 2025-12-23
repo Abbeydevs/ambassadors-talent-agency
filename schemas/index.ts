@@ -330,6 +330,7 @@ export const BlogPostSchema = z.object({
 
   isPublished: z.boolean(),
   authorId: z.string().min(1, { message: "Author is required" }),
+  customByline: z.string().optional(),
 });
 
 export const CategorySchema = z.object({

@@ -141,6 +141,7 @@ model BlogPost {
   
   authorId    String
   author      User        @relation("PostAuthor", fields: [authorId], references: [id])
+  customByline String?
   
   categoryId  String?
   category    BlogCategory? @relation(fields: [categoryId], references: [id])
