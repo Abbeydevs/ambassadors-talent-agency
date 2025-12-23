@@ -48,7 +48,8 @@ export const upsertBlogPost = async (
   postId?: string
 ) => {
   const session = await auth();
-  if (session?.user?.role !== "ADMIN") return { error: "Unauthorized" };
+  if (!session?.user || session?.user?.role !== "ADMIN")
+    return { error: "Unauthorized" };
 
   const validated = BlogPostSchema.safeParse(values);
   if (!validated.success) return { error: "Invalid fields" };
@@ -62,6 +63,7 @@ export const upsertBlogPost = async (
     isPublished,
     metaTitle,
     metaDescription,
+    authorId,
   } = validated.data;
 
   const slug = generateSlug(title);
@@ -80,6 +82,7 @@ export const upsertBlogPost = async (
           metaTitle,
           metaDescription,
           slug,
+          authorId,
         },
       });
       revalidatePath(`/blog/${slug}`);

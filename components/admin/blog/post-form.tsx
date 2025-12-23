@@ -60,9 +60,14 @@ import { Loader2, Save, PlusCircle, Link as LinkIcon } from "lucide-react";
 interface PostFormProps {
   initialData?: BlogPost | null;
   categories: { id: string; name: string }[];
+  authors: { id: string; name: string | null }[];
 }
 
-export const PostForm = ({ initialData, categories }: PostFormProps) => {
+export const PostForm = ({
+  initialData,
+  categories,
+  authors,
+}: PostFormProps) => {
   const [isPending, startTransition] = useTransition();
 
   const [isCategoryModalOpen, setIsCategoryModalOpen] = useState(false);
@@ -83,6 +88,7 @@ export const PostForm = ({ initialData, categories }: PostFormProps) => {
       isPublished: initialData?.isPublished || false,
       metaTitle: initialData?.metaTitle || "",
       metaDescription: initialData?.metaDescription || "",
+      authorId: initialData?.authorId || authors[0]?.id || "",
     },
   });
 
@@ -261,6 +267,41 @@ export const PostForm = ({ initialData, categories }: PostFormProps) => {
                           onCheckedChange={field.onChange}
                         />
                       </FormControl>
+                    </FormItem>
+                  )}
+                />
+              </CardContent>
+            </Card>
+
+            <Card>
+              <CardHeader>
+                <CardTitle>Author</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <FormField
+                  control={form.control}
+                  name="authorId"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Assign To</FormLabel>
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <FormControl>
+                          <SelectTrigger>
+                            <SelectValue placeholder="Select author" />
+                          </SelectTrigger>
+                        </FormControl>
+                        <SelectContent>
+                          {authors.map((author) => (
+                            <SelectItem key={author.id} value={author.id}>
+                              {author.name || "Unnamed Author"}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                      <FormMessage />
                     </FormItem>
                   )}
                 />

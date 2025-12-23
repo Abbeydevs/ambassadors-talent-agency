@@ -324,13 +324,12 @@ export const BlogPostSchema = z.object({
   content: z.string().min(1, "Content is required"),
   excerpt: z.string().optional(),
   coverImage: z.string().optional(),
-
   categoryId: z.string().optional(),
-
   metaTitle: z.string().optional(),
   metaDescription: z.string().optional(),
 
   isPublished: z.boolean(),
+  authorId: z.string().min(1, { message: "Author is required" }),
 });
 
 export const CategorySchema = z.object({
