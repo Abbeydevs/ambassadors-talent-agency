@@ -38,7 +38,6 @@ export default async function EmployerSettingsPage() {
         </div>
       </div>
 
-      {/* Info Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div className="bg-white rounded-xl p-5 shadow-sm border">
           <div className="flex items-start gap-3">

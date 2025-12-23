@@ -1,6 +1,5 @@
 import { db } from "@/lib/db";
 import { JobStatus } from "@prisma/client";
-import { stat } from "fs";
 
 export const getJobsByEmployerId = async (
   employerId: string,

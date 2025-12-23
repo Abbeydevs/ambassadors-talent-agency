@@ -110,6 +110,7 @@ model User {
   activitiesReceived  ActivityLog[] @relation("TargetActivities")
   notifications       Notification[]
   createdAnnouncements Announcement[] @relation("CreatedAnnouncements")
+  successStories SuccessStory[]
 }
 
 model BlogCategory {
@@ -172,6 +173,26 @@ model Comment {
   
   @@index([userId])
   @@index([postId])
+}
+
+model SuccessStory {
+  id             String   @id @default(cuid())
+  title          String  
+  slug           String   @unique 
+  excerpt        String   @db.Text
+  content        String   @db.Text
+  coverImage     String? 
+  featured       Boolean  @default(false) 
+  category       String  
+  
+  talentId       String?
+  talent         User?    @relation(fields: [talentId], references: [id])
+  
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  @@index([category])
+  @@index([featured])
 }
 
 model Ticket {
