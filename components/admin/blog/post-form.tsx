@@ -52,7 +52,17 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { Switch } from "@/components/ui/switch";
-import { Loader2, Save, PlusCircle, Link as LinkIcon } from "lucide-react";
+import {
+  Loader2,
+  Save,
+  PlusCircle,
+  LinkIcon,
+  FileText,
+  Globe,
+  User,
+  FolderOpen,
+  ImageIcon,
+} from "lucide-react";
 
 interface PostFormProps {
   initialData?: BlogPost | null;
@@ -116,8 +126,6 @@ export const PostForm = ({
           setCategoryList([...categoryList, data.category]);
           form.setValue("categoryId", data.category.id);
           setNewCategoryName("");
-
-          // 👇 CLOSE MODAL ON SUCCESS
           setIsCategoryModalOpen(false);
         }
       });
@@ -126,33 +134,57 @@ export const PostForm = ({
 
   return (
     <Form {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8">
-        <div className="flex items-center justify-between">
-          <h2 className="text-3xl font-bold tracking-tight">
-            {initialData ? "Edit Post" : "Create Post"}
-          </h2>
-          <Button type="submit" disabled={isPending}>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white border border-gray-200 rounded-xl p-6 shadow-sm">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
+              <div className="h-10 w-10 bg-purple-50 rounded-lg flex items-center justify-center">
+                <FileText className="h-6 w-6 text-purple-600" />
+              </div>
+              {initialData ? "Edit Post" : "Create New Post"}
+            </h1>
+            <p className="text-sm text-gray-500 mt-1">
+              {initialData
+                ? "Update your blog article"
+                : "Write and publish a new blog article"}
+            </p>
+          </div>
+          <Button
+            type="submit"
+            disabled={isPending}
+            onClick={form.handleSubmit(onSubmit)}
+            className="bg-blue-600 hover:bg-blue-700"
+          >
             {isPending && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
             <Save className="mr-2 h-4 w-4" />
             Save Article
           </Button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* LEFT COLUMN */}
-          <div className="lg:col-span-2 space-y-8">
-            <Card>
-              <CardContent className="pt-6 space-y-4">
+          <div className="lg:col-span-2 space-y-6">
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <FileText className="h-5 w-5 text-purple-600" />
+                  Article Content
+                </CardTitle>
+                <CardDescription>Write your blog post content</CardDescription>
+              </CardHeader>
+              <CardContent className="pt-6 space-y-5">
                 <FormField
                   control={form.control}
                   name="title"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Article Title</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Article Title
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="Enter title here..."
-                          className="text-lg font-medium"
+                          placeholder="Enter an engaging title..."
+                          className="text-lg font-medium bg-white border-gray-200 focus-visible:ring-blue-600"
                           {...field}
                         />
                       </FormControl>
@@ -166,7 +198,9 @@ export const PostForm = ({
                   name="content"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Content</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Content
+                      </FormLabel>
                       <FormControl>
                         <ReactQuill
                           theme="snow"
@@ -185,16 +219,19 @@ export const PostForm = ({
                   name="excerpt"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Excerpt (Summary)</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Excerpt (Summary)
+                      </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="A short summary..."
-                          className="resize-none"
+                          placeholder="Write a compelling summary for your article..."
+                          className="resize-none bg-white border-gray-200 focus-visible:ring-blue-600 min-h-[100px]"
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        Appears on the homepage card.
+                      <FormDescription className="text-gray-500">
+                        This appears on blog listing pages and social media
+                        previews
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -203,21 +240,35 @@ export const PostForm = ({
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>SEO Settings</CardTitle>
-                <CardDescription>Optimize for Google.</CardDescription>
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <Globe className="h-5 w-5 text-blue-600" />
+                  SEO Settings
+                </CardTitle>
+                <CardDescription>
+                  Optimize your article for search engines
+                </CardDescription>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-6 space-y-5">
                 <FormField
                   control={form.control}
                   name="metaTitle"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Meta Title</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Meta Title
+                      </FormLabel>
                       <FormControl>
-                        <Input placeholder="SEO Title" {...field} />
+                        <Input
+                          placeholder="SEO optimized title"
+                          className="bg-white border-gray-200 focus-visible:ring-blue-600"
+                          {...field}
+                        />
                       </FormControl>
+                      <FormDescription className="text-gray-500">
+                        Recommended: 50-60 characters
+                      </FormDescription>
                     </FormItem>
                   )}
                 />
@@ -226,14 +277,19 @@ export const PostForm = ({
                   name="metaDescription"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Meta Description</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Meta Description
+                      </FormLabel>
                       <FormControl>
                         <Textarea
-                          placeholder="SEO Description"
-                          className="resize-none"
+                          placeholder="Brief description for search results..."
+                          className="resize-none bg-white border-gray-200 focus-visible:ring-blue-600"
                           {...field}
                         />
                       </FormControl>
+                      <FormDescription className="text-gray-500">
+                        Recommended: 150-160 characters
+                      </FormDescription>
                     </FormItem>
                   )}
                 />
@@ -243,20 +299,27 @@ export const PostForm = ({
 
           {/* RIGHT COLUMN */}
           <div className="space-y-6">
-            <Card>
-              <CardHeader>
-                <CardTitle>Publishing</CardTitle>
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <Globe className="h-5 w-5 text-green-600" />
+                  Publishing
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-6">
                 <FormField
                   control={form.control}
                   name="isPublished"
                   render={({ field }) => (
-                    <FormItem className="flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm">
+                    <FormItem className="flex flex-row items-center justify-between rounded-lg border border-gray-200 p-4 shadow-sm bg-white">
                       <div className="space-y-0.5">
-                        <FormLabel>Published</FormLabel>
-                        <FormDescription>
-                          {field.value ? "Visible to public" : "Draft mode"}
+                        <FormLabel className="text-gray-900 font-semibold">
+                          Publication Status
+                        </FormLabel>
+                        <FormDescription className="text-gray-500">
+                          {field.value
+                            ? "✓ Live and visible to public"
+                            : "○ Draft mode"}
                         </FormDescription>
                       </div>
                       <FormControl>
@@ -271,23 +334,28 @@ export const PostForm = ({
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Author</CardTitle>
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <User className="h-5 w-5 text-blue-600" />
+                  Author
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6 space-y-4">
                 <FormField
                   control={form.control}
                   name="authorId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Assign To</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Assign To
+                      </FormLabel>
                       <Select
                         onValueChange={field.onChange}
                         defaultValue={field.value}
                       >
                         <FormControl>
-                          <SelectTrigger>
+                          <SelectTrigger className="bg-white border-gray-200">
                             <SelectValue placeholder="Select author" />
                           </SelectTrigger>
                         </FormControl>
@@ -304,9 +372,9 @@ export const PostForm = ({
                   )}
                 />
 
-                <div className="relative flex items-center py-5">
-                  <span className="w-full border-t" />
-                  <span className="absolute left-1/2 -translate-x-1/2 bg-white px-2 text-xs text-muted-foreground uppercase">
+                <div className="relative flex items-center py-3">
+                  <span className="w-full border-t border-gray-200" />
+                  <span className="absolute left-1/2 -translate-x-1/2 bg-white px-2 text-xs text-gray-500 uppercase font-medium">
                     OR
                   </span>
                 </div>
@@ -316,16 +384,18 @@ export const PostForm = ({
                   name="customByline"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Custom Byline (Guest)</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Custom Byline
+                      </FormLabel>
                       <FormControl>
                         <Input
-                          placeholder="e.g. Guest Contributor: John Smith"
+                          placeholder="e.g. Guest Author: Jane Doe"
+                          className="bg-white border-gray-200 focus-visible:ring-blue-600"
                           {...field}
                         />
                       </FormControl>
-                      <FormDescription>
-                        If filled, this text will appear instead of the user
-                        profile.
+                      <FormDescription className="text-gray-500 text-xs">
+                        Overrides author profile if provided
                       </FormDescription>
                       <FormMessage />
                     </FormItem>
@@ -334,25 +404,30 @@ export const PostForm = ({
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Category</CardTitle>
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <FolderOpen className="h-5 w-5 text-amber-600" />
+                  Category
+                </CardTitle>
               </CardHeader>
-              <CardContent className="space-y-4">
+              <CardContent className="pt-6">
                 <FormField
                   control={form.control}
                   name="categoryId"
                   render={({ field }) => (
                     <FormItem>
-                      <FormLabel>Select Category</FormLabel>
+                      <FormLabel className="text-gray-900 font-semibold">
+                        Select Category
+                      </FormLabel>
                       <div className="flex gap-2">
                         <Select
                           onValueChange={field.onChange}
                           defaultValue={field.value}
                         >
                           <FormControl>
-                            <SelectTrigger>
-                              <SelectValue placeholder="Select..." />
+                            <SelectTrigger className="bg-white border-gray-200">
+                              <SelectValue placeholder="Choose a category..." />
                             </SelectTrigger>
                           </FormControl>
                           <SelectContent>
@@ -364,35 +439,44 @@ export const PostForm = ({
                           </SelectContent>
                         </Select>
 
-                        {/* 👇 CONTROLLED DIALOG */}
                         <Dialog
                           open={isCategoryModalOpen}
                           onOpenChange={setIsCategoryModalOpen}
                         >
                           <DialogTrigger asChild>
-                            <Button variant="outline" size="icon">
+                            <Button
+                              variant="outline"
+                              size="icon"
+                              className="border-gray-200 hover:bg-gray-50"
+                            >
                               <PlusCircle className="h-4 w-4" />
                             </Button>
                           </DialogTrigger>
-                          <DialogContent>
+                          <DialogContent className="bg-white">
                             <DialogHeader>
-                              <DialogTitle>Add New Category</DialogTitle>
+                              <DialogTitle className="text-xl font-semibold text-gray-900">
+                                Add New Category
+                              </DialogTitle>
                             </DialogHeader>
                             <div className="py-4">
                               <Input
-                                placeholder="Category Name"
+                                placeholder="Category name"
                                 value={newCategoryName}
                                 onChange={(e) =>
                                   setNewCategoryName(e.target.value)
                                 }
+                                className="bg-white border-gray-200 focus-visible:ring-blue-600"
                               />
                             </div>
                             <DialogFooter>
                               <Button
                                 onClick={onAddCategory}
                                 disabled={isCreatingCategory}
+                                className="bg-blue-600 hover:bg-blue-700"
                               >
-                                {isCreatingCategory ? "Saving..." : "Create"}
+                                {isCreatingCategory
+                                  ? "Creating..."
+                                  : "Create Category"}
                               </Button>
                             </DialogFooter>
                           </DialogContent>
@@ -405,11 +489,14 @@ export const PostForm = ({
               </CardContent>
             </Card>
 
-            <Card>
-              <CardHeader>
-                <CardTitle>Featured Image</CardTitle>
+            <Card className="border-gray-200 shadow-sm">
+              <CardHeader className="bg-linear-to-r from-gray-50 to-gray-100/50 border-b border-gray-200">
+                <CardTitle className="flex items-center gap-2 text-gray-900">
+                  <ImageIcon className="h-5 w-5 text-purple-600" />
+                  Featured Image
+                </CardTitle>
               </CardHeader>
-              <CardContent>
+              <CardContent className="pt-6">
                 <FormField
                   control={form.control}
                   name="coverImage"
@@ -427,10 +514,10 @@ export const PostForm = ({
 
                       <div className="relative my-4">
                         <div className="absolute inset-0 flex items-center">
-                          <span className="w-full border-t"></span>
+                          <span className="w-full border-t border-gray-200"></span>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase">
-                          <span className="bg-white px-2 text-slate-500">
+                          <span className="bg-white px-2 text-gray-500 font-medium">
                             Or use URL
                           </span>
                         </div>
@@ -438,11 +525,12 @@ export const PostForm = ({
 
                       <FormControl>
                         <div className="flex items-center gap-2">
-                          <LinkIcon className="h-4 w-4 text-slate-500" />
+                          <LinkIcon className="h-4 w-4 text-gray-400" />
                           <Input
-                            placeholder="https://..."
+                            placeholder="https://example.com/image.jpg"
                             {...field}
                             disabled={isPending}
+                            className="bg-white border-gray-200 focus-visible:ring-blue-600"
                           />
                         </div>
                       </FormControl>
@@ -454,7 +542,7 @@ export const PostForm = ({
             </Card>
           </div>
         </div>
-      </form>
+      </div>
     </Form>
   );
 };

@@ -3,11 +3,10 @@
 
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { ImagePlus, Trash, Loader2 } from "lucide-react";
+import { ImagePlus, Trash, Loader2, Upload } from "lucide-react";
 import { getCloudinarySignature } from "@/actions/get-signature";
 import { toast } from "sonner";
 import { Input } from "./input";
-import { cn } from "@/lib/utils";
 
 interface ImageUploadProps {
   disabled?: boolean;
@@ -61,7 +60,7 @@ export const ImageUpload = ({
       }
 
       onChange(data.secure_url);
-      toast.success("Image uploaded!");
+      toast.success("Image uploaded successfully!");
     } catch (error) {
       console.error(error);
       toast.error("Something went wrong with the upload.");
@@ -70,64 +69,77 @@ export const ImageUpload = ({
     }
   };
 
+  const containerClasses =
+    variant === "avatar"
+      ? "flex flex-col gap-4 items-center justify-center"
+      : "flex flex-col gap-4 items-start";
+
+  const imageContainerClasses =
+    variant === "avatar"
+      ? "h-40 w-40 rounded-full border-4 border-gray-200"
+      : "w-full aspect-video rounded-xl max-h-[300px] border-2 border-gray-200";
+
   return (
-    <div
-      className={cn(
-        "flex flex-col gap-4",
-        variant === "avatar" ? "items-center justify-center" : "items-start"
-      )}
-    >
+    <div className={containerClasses}>
       <div
-        className={cn(
-          "relative overflow-hidden border-4 border-white/20 shadow-xl bg-slate-100",
-          variant === "avatar"
-            ? "h-40 w-40 rounded-full"
-            : "w-full aspect-video rounded-lg max-h-[300px] object-cover"
-        )}
+        className={`relative overflow-hidden shadow-md bg-gray-100 ${imageContainerClasses}`}
       >
         {value ? (
-          <div className="relative h-full w-full">
+          <div className="relative h-full w-full group">
             <img
               src={value}
               alt="Upload"
               className="object-cover w-full h-full"
             />
-            <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 transition-opacity flex items-center justify-center">
+            <div className="absolute inset-0 bg-linear-to-t from-black/60 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-200 flex items-center justify-center">
               <Button
                 type="button"
                 onClick={() => onRemove(value)}
                 variant="destructive"
                 size="icon"
-                className="h-10 w-10 rounded-full"
+                className="h-12 w-12 rounded-full shadow-lg bg-red-600 hover:bg-red-700 transform scale-90 group-hover:scale-100 transition-transform"
               >
                 <Trash className="h-5 w-5" />
               </Button>
             </div>
           </div>
         ) : (
-          <div className="h-full w-full flex items-center justify-center bg-slate-200 text-slate-400">
+          <div className="h-full w-full flex flex-col items-center justify-center bg-linear-to-br from-gray-50 to-gray-100 text-gray-400">
             {isLoading ? (
-              <Loader2 className="h-10 w-10 animate-spin" />
+              <div className="flex flex-col items-center gap-3">
+                <Loader2 className="h-12 w-12 animate-spin text-blue-600" />
+                <p className="text-sm font-medium text-gray-600">
+                  Uploading...
+                </p>
+              </div>
             ) : (
-              <ImagePlus className="h-10 w-10" />
+              <div className="flex flex-col items-center gap-3">
+                <div className="h-16 w-16 bg-gray-200 rounded-full flex items-center justify-center">
+                  <ImagePlus className="h-8 w-8 text-gray-400" />
+                </div>
+                <p className="text-sm font-medium text-gray-500">
+                  {variant === "avatar" ? "No photo" : "No image"}
+                </p>
+              </div>
             )}
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-4">
+      <div className="flex items-center gap-3">
         <Button
           type="button"
           disabled={disabled || isLoading}
           variant="outline"
           onClick={() => document.getElementById("imageInput")?.click()}
-          className="bg-white/10 border-white/20 hover:bg-white/20 text-slate-900"
+          className="bg-white border-gray-200 hover:bg-gray-50 text-gray-900 font-medium shadow-sm"
         >
+          <Upload className="h-4 w-4 mr-2" />
           {isLoading
             ? "Uploading..."
             : variant === "avatar"
             ? "Change Photo"
-            : "Upload Cover Image"}
+            : "Upload Image"}
         </Button>
         <Input
           id="imageInput"
