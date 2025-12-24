@@ -5,7 +5,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Calendar, MapPin, Share2, ArrowLeft } from "lucide-react";
+import { Calendar, MapPin, ArrowLeft } from "lucide-react";
 import SocialShare from "@/components/success-stories/social-share";
 
 interface PageProps {

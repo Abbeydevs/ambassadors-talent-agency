@@ -104,6 +104,7 @@ model User {
   reportsReceived     Report[]  @relation("ReportedUser")
   blogPosts     BlogPost[]    @relation("PostAuthor")
   comments      Comment[]
+  eventRsvps     EventRSVP[]
 
   employerProfile EmployerProfile?
   activitiesPerformed ActivityLog[] @relation("ActorActivities")
@@ -266,6 +267,41 @@ model SystemSettings {
   emailTemplates    Json?    
 
   updatedAt         DateTime @updatedAt
+}
+
+model Event {
+  id          String   @id @default(cuid())
+  title       String
+  slug        String   @unique
+  description String   @db.Text
+  location    String 
+  
+  startDate   DateTime
+  endDate     DateTime
+  
+  coverImage  String?
+  capacity    Int? 
+  
+  isPublished Boolean  @default(false)
+  
+  rsvps       EventRSVP[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model EventRSVP {
+  id        String   @id @default(cuid())
+  
+  eventId   String
+  event     Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  createdAt DateTime @default(now())
+
+  @@unique([eventId, userId])
 }
 
 model Wallet {
