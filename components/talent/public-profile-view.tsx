@@ -26,7 +26,6 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 
-// Type definition for the full profile data
 type FullProfile = TalentProfile & {
   user: User;
   photos: PortfolioPhoto[];
@@ -36,34 +35,28 @@ type FullProfile = TalentProfile & {
 
 interface PublicProfileViewProps {
   profile: FullProfile;
-  isPreview?: boolean; // If true, shows "Edit" instead of "Message"
+  isPreview?: boolean;
 }
 
 export const PublicProfileView = ({
   profile,
   isPreview,
 }: PublicProfileViewProps) => {
-  // Calculate age if DOB exists
   const age = profile.dateOfBirth
     ? new Date().getFullYear() - new Date(profile.dateOfBirth).getFullYear()
     : null;
 
   return (
     <div className="min-h-screen bg-white pb-20">
-      {/* 1. HERO SECTION (Twitter/LinkedIn Style Header) */}
       <div className="relative">
-        {/* Cover Photo - Gradient pattern since we don't have a custom cover upload yet */}
         <div className="h-48 md:h-64 w-full bg-linear-to-r from-[#1E40AF] via-[#3B82F6] to-[#60A5FA] relative overflow-hidden">
           <div className="absolute inset-0 bg-grid-white/[0.1] bg-size-[20px_20px]"></div>
-          {/* Decorative blobs */}
           <div className="absolute -top-24 -left-24 w-64 h-64 bg-white/10 rounded-full blur-3xl"></div>
           <div className="absolute bottom-0 right-0 w-64 h-64 bg-black/10 rounded-full blur-3xl"></div>
         </div>
 
-        {/* Profile Header Content */}
         <div className="px-4 md:px-8 max-w-4xl mx-auto">
           <div className="relative -mt-20 mb-4 flex flex-col md:flex-row items-start md:items-end justify-between gap-4">
-            {/* Avatar */}
             <div className="relative">
               <div className="h-32 w-32 md:h-40 md:w-40 rounded-full p-1.5 bg-white shadow-xl">
                 <Avatar className="h-full w-full border-2 border-gray-100">
@@ -76,13 +69,11 @@ export const PublicProfileView = ({
                   </AvatarFallback>
                 </Avatar>
               </div>
-              {/* Verification Badge */}
               <div className="absolute bottom-2 right-2 bg-blue-500 text-white p-1 rounded-full border-4 border-white">
                 <CheckCircle2 className="h-4 w-4" />
               </div>
             </div>
 
-            {/* Action Buttons */}
             <div className="flex gap-3 w-full md:w-auto mt-2 md:mt-0">
               {isPreview ? (
                 <Button

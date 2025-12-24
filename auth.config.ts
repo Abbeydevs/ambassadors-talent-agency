@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import type { NextAuthConfig } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
-import { Role } from "@prisma/client"; // Import Role type if available, or cast as string
+import { Role } from "@prisma/client";
 
 export default {
   providers: [

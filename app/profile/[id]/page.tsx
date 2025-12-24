@@ -1,5 +1,3 @@
-// app/profile/[id]/page.tsx
-
 import { auth } from "@/auth";
 import { getTalentProfileByUserId } from "@/data/talent-profile";
 import { PublicProfileView } from "@/components/talent/public-profile-view";

@@ -27,7 +27,9 @@ export default auth((req) => {
 
   const isAdminRoute = nextUrl.pathname.startsWith("/admin");
   const isEmployerRoute = nextUrl.pathname.startsWith("/employer");
-  const isTalentRoute = nextUrl.pathname.startsWith("/talent");
+  const isTalentRoute =
+    nextUrl.pathname.startsWith("/talent") &&
+    !nextUrl.pathname.startsWith("/talents");
 
   if (isApiAuthRoute) {
     return null;

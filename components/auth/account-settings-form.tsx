@@ -44,10 +44,6 @@ export const AccountSettingsForm = () => {
   const { data: session, update } = useSession();
   const [isPending, startTransition] = useTransition();
 
-  // Check if user logged in with OAuth (no password needed)
-  // Usually determined by missing password in session or a provider flag.
-  // For now, we just show the fields.
-
   const form = useForm<z.infer<typeof SettingsSchema>>({
     resolver: zodResolver(SettingsSchema),
     defaultValues: {
