@@ -281,6 +281,8 @@ model Event {
   
   coverImage  String?
   capacity    Int? 
+  category    String   @default("General")
+  featured    Boolean  @default(false)
   
   isPublished Boolean  @default(false)
   

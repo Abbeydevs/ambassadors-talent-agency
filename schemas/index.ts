@@ -353,3 +353,21 @@ export const SuccessStorySchema = z.object({
   featured: z.boolean(),
   isPublished: z.boolean(),
 });
+
+export const EventSchema = z
+  .object({
+    title: z.string().min(1, { message: "Title is required" }),
+    slug: z.string().min(1, { message: "Slug is required" }),
+    description: z.string().min(10, { message: "Description is required" }),
+    location: z.string().min(1, { message: "Location is required" }),
+    coverImage: z.string().optional(),
+    category: z.string().min(1, { message: "Category is required" }),
+    startDate: z.date(),
+    endDate: z.date(),
+    featured: z.boolean(),
+    isPublished: z.boolean(),
+  })
+  .refine((data) => data.endDate > data.startDate, {
+    message: "End date must be after the start date",
+    path: ["endDate"],
+  });

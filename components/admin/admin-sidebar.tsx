@@ -15,6 +15,7 @@ import {
   AppWindowMac,
   MessageSquare,
   Star,
+  Calendar,
 } from "lucide-react";
 import { signOut } from "next-auth/react";
 
@@ -48,6 +49,11 @@ const routes = [
     label: "Success Stories",
     icon: Star,
     href: "/admin/success-stories",
+  },
+  {
+    label: "Events",
+    icon: Calendar,
+    href: "/admin/events",
   },
   {
     label: "Comments",
