@@ -39,8 +39,12 @@ export const JobFilters = () => {
     const urlLocation = searchParams.get("location") || "";
     const urlSalary = Number(searchParams.get("minSalary")) || 0;
 
-    if (location !== urlLocation) setLocation(urlLocation);
-    if (minSalary !== urlSalary) setMinSalary(urlSalary);
+    if (urlLocation !== location) {
+      setLocation(urlLocation);
+    }
+    if (urlSalary !== minSalary) {
+      setMinSalary(urlSalary);
+    }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [searchParams]);
 
@@ -54,7 +58,6 @@ export const JobFilters = () => {
     }
 
     params.set("page", "1");
-
     router.push(`/jobs?${params.toString()}`);
   };
 
