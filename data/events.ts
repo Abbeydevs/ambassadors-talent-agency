@@ -22,3 +22,23 @@ export const getAllEvents = async () => {
     return [];
   }
 };
+
+export const getEventBySlug = async (slug: string) => {
+  try {
+    const event = await db.event.findUnique({
+      where: { slug },
+      include: {
+        _count: {
+          select: { rsvps: true },
+        },
+        rsvps: {
+          select: { userId: true },
+        },
+      },
+    });
+    return event;
+  } catch (error) {
+    console.error(`Error fetching event with slug ${slug}:`, error);
+    return null;
+  }
+};
