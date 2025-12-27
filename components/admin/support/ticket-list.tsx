@@ -1,7 +1,7 @@
 "use client";
 
 import { useTransition } from "react";
-import { Ticket, TicketStatus, TicketPriority } from "@prisma/client";
+import { Ticket, TicketStatus, TicketPriority, User } from "@prisma/client";
 import { updateTicketStatus } from "@/actions/admin/tickets";
 import { toast } from "sonner";
 import { formatDistanceToNow } from "date-fns";
@@ -30,15 +30,14 @@ import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 
-interface TicketWithUser extends Ticket {
+export type TicketWithUser = Ticket & {
   user: {
     name: string | null;
-    email: string | null;
+    email: string;
     image: string | null;
-    role: "ADMIN" | "USER" | "TALENT" | "EMPLOYER";
+    role: User["role"];
   };
-}
-
+};
 interface TicketListProps {
   tickets: TicketWithUser[];
 }
