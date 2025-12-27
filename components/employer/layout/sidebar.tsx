@@ -9,7 +9,7 @@ import {
   Briefcase,
   Users,
   Search,
-  MessageSquare,
+  // MessageSquare,
   Building2,
   Settings,
   Heart,
@@ -52,11 +52,11 @@ const sidebarRoutes = [
     href: "/employer/verification",
     icon: ShieldCheck,
   },
-  {
-    icon: MessageSquare,
-    label: "Messages",
-    href: "/employer/messages",
-  },
+  // {
+  //   icon: MessageSquare,
+  //   label: "Messages",
+  //   href: "/employer/messages",
+  // },
   {
     icon: Building2,
     label: "Company Profile",

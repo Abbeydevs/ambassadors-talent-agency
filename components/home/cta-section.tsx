@@ -18,7 +18,7 @@ export function CTASection() {
           Ambassador Talent Agency today.
         </p>
         <div className="flex flex-col sm:flex-row gap-4 justify-center">
-          <Link href="/auth/register?role=TALENT">
+          <Link href="/auth/register/talent">
             <Button
               size="lg"
               className="bg-white text-[#1E40AF] hover:bg-slate-100 text-lg px-8 py-6 font-semibold shadow-lg"
@@ -26,7 +26,7 @@ export function CTASection() {
               Join as Talent
             </Button>
           </Link>
-          <Link href="/auth/register?role=EMPLOYER">
+          <Link href="/auth/register/employer">
             <Button
               size="lg"
               variant="outline"

@@ -15,6 +15,7 @@ const navLinks = [
   { label: "Events", href: "/events" },
   { label: "Academy", href: "/courses" },
   { label: "Success Stories", href: "/success-stories" },
+  { label: "Blog", href: "/blog" },
 ];
 
 export const Navbar = () => {
@@ -86,7 +87,7 @@ export const Navbar = () => {
                   Log In
                 </Button>
               </Link>
-              <Link href="/auth/register">
+              <Link href="/auth/register/talent">
                 <Button className="bg-[#1E40AF] hover:bg-[#1E40AF]/90">
                   Sign Up
                 </Button>

@@ -19,12 +19,14 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { RegisterTabs } from "@/components/auth/register-tabs";
+import { useRouter } from "next/navigation";
 
 interface RegisterFormProps {
   role: "TALENT" | "EMPLOYER";
 }
 
 export const RegisterForm = ({ role }: RegisterFormProps) => {
+  const router = useRouter();
   const [error, setError] = useState<string | undefined>("");
   const [success, setSuccess] = useState<string | undefined>("");
   const [isPending, startTransition] = useTransition();
@@ -45,8 +47,15 @@ export const RegisterForm = ({ role }: RegisterFormProps) => {
 
     startTransition(() => {
       register(values).then((data) => {
-        setError(data.error);
-        setSuccess(data.success);
+        if (data.error) {
+          setError(data.error);
+        }
+
+        if (data.success) {
+          router.push(
+            `/auth/login?success=${encodeURIComponent(data.success)}`
+          );
+        }
       });
     });
   };

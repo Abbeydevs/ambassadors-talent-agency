@@ -1,11 +1,37 @@
 import { db } from "@/lib/db";
+import { Prisma } from "@prisma/client";
 
-export const getAllEvents = async () => {
+export interface EventFilterParams {
+  query?: string;
+  category?: string;
+  location?: string;
+  startDate?: Date;
+}
+
+export const getAllEvents = async (params: EventFilterParams = {}) => {
+  const { query, category, location, startDate } = params;
+
+  const where: Prisma.EventWhereInput = {
+    isPublished: true,
+    AND: [
+      query
+        ? {
+            OR: [
+              { title: { contains: query, mode: "insensitive" } },
+              { description: { contains: query, mode: "insensitive" } },
+              { location: { contains: query, mode: "insensitive" } },
+            ],
+          }
+        : {},
+      category ? { category: { equals: category, mode: "insensitive" } } : {},
+      location ? { location: { contains: location, mode: "insensitive" } } : {},
+      startDate ? { startDate: { gte: startDate } } : {},
+    ],
+  };
+
   try {
     const events = await db.event.findMany({
-      where: {
-        isPublished: true,
-      },
+      where,
       orderBy: {
         startDate: "asc",
       },

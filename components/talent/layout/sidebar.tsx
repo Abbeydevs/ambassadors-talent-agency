@@ -8,7 +8,7 @@ import {
   FolderOpen,
   Bookmark,
   GraduationCap,
-  MessageSquare,
+  // MessageSquare,
   Settings,
   HelpCircle,
   ShieldCheck,
@@ -35,11 +35,11 @@ const sidebarRoutes = [
     label: "My Courses",
     href: "/talent/courses",
   },
-  {
-    icon: MessageSquare,
-    label: "Messages",
-    href: "/talent/messages",
-  },
+  // {
+  //   icon: MessageSquare,
+  //   label: "Messages",
+  //   href: "/talent/messages",
+  // },
   {
     icon: Settings,
     label: "Edit Profile",

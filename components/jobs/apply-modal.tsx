@@ -36,6 +36,7 @@ import {
   CheckCircle2,
   ArrowRight,
   Sparkles,
+  AlertCircle,
 } from "lucide-react";
 import { MultiFileUpload } from "@/components/ui/multi-file-upload";
 
@@ -100,7 +101,6 @@ export const ApplyModal = ({
     <Dialog open={open} onOpenChange={handleOpenChange}>
       <DialogTrigger asChild>{children}</DialogTrigger>
       <DialogContent className="sm:max-w-[600px] max-h-[90vh] overflow-y-auto">
-        {/* CONDITIONAL RENDERING: Success View vs Form View */}
         {isSuccess ? (
           <div className="flex flex-col items-center justify-center py-12 text-center space-y-6">
             <div className="relative">
@@ -167,21 +167,47 @@ export const ApplyModal = ({
               </DialogDescription>
             </DialogHeader>
 
-            {profile && (
+            {!profile ? (
+              <div className="flex flex-col items-center justify-center py-8 text-center space-y-4">
+                <div className="p-4 bg-amber-50 rounded-full border border-amber-100">
+                  <AlertCircle className="w-8 h-8 text-amber-600" />
+                </div>
+                <div className="max-w-xs space-y-2">
+                  <h3 className="font-semibold text-slate-900 text-lg">
+                    Profile Incomplete
+                  </h3>
+                  <p className="text-sm text-slate-500">
+                    You need to create your talent profile before you can apply
+                    for jobs. It only takes a minute!
+                  </p>
+                </div>
+                <Button
+                  asChild
+                  className="bg-[#1E40AF] hover:bg-[#1E40AF]/90 w-full"
+                >
+                  <Link href="/talent/profile/edit/personal">
+                    Create Profile
+                  </Link>
+                </Button>
+              </div>
+            ) : (
               <div className="grid gap-6 py-4">
-                {/* User Summary Card */}
                 <div className="flex items-center gap-4 p-4 bg-slate-50 rounded-lg border">
-                  <Avatar className="h-12 w-12">
+                  <Avatar className="h-12 w-12 border border-slate-200">
                     <AvatarImage src={profile.user.image || ""} />
-                    <AvatarFallback>{profile.user.name?.[0]}</AvatarFallback>
+                    <AvatarFallback className="bg-slate-200">
+                      {profile.user.name?.[0]}
+                    </AvatarFallback>
                   </Avatar>
                   <div>
-                    <p className="font-semibold text-sm">{profile.user.name}</p>
-                    <p className="text-xs text-muted-foreground">
+                    <p className="font-semibold text-sm text-slate-900">
+                      {profile.user.name}
+                    </p>
+                    <p className="text-xs text-slate-500">
                       {profile.user.email}
                     </p>
-                    <p className="text-xs text-muted-foreground">
-                      {profile.phone}
+                    <p className="text-xs text-slate-500 mt-0.5">
+                      {profile.phone || "No phone added"}
                     </p>
                   </div>
                 </div>
@@ -196,11 +222,13 @@ export const ApplyModal = ({
                       name="coverLetter"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Cover Letter (Optional)</FormLabel>
+                          <FormLabel className="font-semibold text-slate-700">
+                            Cover Letter
+                          </FormLabel>
                           <FormControl>
                             <Textarea
                               placeholder="Introduce yourself and explain why you're a good fit..."
-                              className="h-32 resize-none"
+                              className="h-32 resize-none focus-visible:ring-[#1E40AF]"
                               {...field}
                             />
                           </FormControl>
@@ -209,13 +237,14 @@ export const ApplyModal = ({
                       )}
                     />
 
-                    {/* Attachments Field */}
                     <FormField
                       control={form.control}
                       name="attachments"
                       render={({ field }) => (
                         <FormItem>
-                          <FormLabel>Additional Documents (Optional)</FormLabel>
+                          <FormLabel className="font-semibold text-slate-700">
+                            Additional Documents (Optional)
+                          </FormLabel>
                           <FormControl>
                             <MultiFileUpload
                               type="pdf"
@@ -252,7 +281,7 @@ export const ApplyModal = ({
                       <Button
                         type="submit"
                         disabled={isPending}
-                        className="bg-[#1E40AF]"
+                        className="bg-[#1E40AF] hover:bg-[#1E40AF]/90"
                       >
                         {isPending && (
                           <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -7,6 +7,7 @@ import { TrainingTeaser } from "@/components/home/training-teaser";
 import { StatsSection } from "@/components/home/stats-section";
 import { Testimonials } from "@/components/home/testimonials";
 import { CTASection } from "@/components/home/cta-section";
+import { HomeBlogSection } from "@/components/home/home-blog-section";
 
 export default function Home() {
   return (
@@ -28,6 +29,8 @@ export default function Home() {
       <Testimonials />
 
       <CTASection />
+
+      <HomeBlogSection />
     </main>
   );
 }

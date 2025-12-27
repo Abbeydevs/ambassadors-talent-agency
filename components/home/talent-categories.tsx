@@ -13,36 +13,42 @@ export function TalentCategories() {
   const categories = [
     {
       name: "Actors",
+      value: "Actor",
       icon: Video,
       color: "bg-red-100 text-red-600",
       border: "border-red-100 hover:border-red-200",
     },
     {
       name: "Models",
+      value: "Model",
       icon: Camera,
       color: "bg-purple-100 text-purple-600",
       border: "border-purple-100 hover:border-purple-200",
     },
     {
       name: "Musicians",
+      value: "Musician",
       icon: Music,
       color: "bg-blue-100 text-blue-600",
       border: "border-blue-100 hover:border-blue-200",
     },
     {
       name: "Dancers",
+      value: "Dancer",
       icon: Mic,
       color: "bg-pink-100 text-pink-600",
       border: "border-pink-100 hover:border-pink-200",
     },
     {
       name: "Presenters",
+      value: "Presenter",
       icon: Tv,
       color: "bg-amber-100 text-amber-600",
       border: "border-amber-100 hover:border-amber-200",
     },
     {
-      name: "Creatives",
+      name: "Voice Over",
+      value: "Voice Over Artist",
       icon: Palette,
       color: "bg-green-100 text-green-600",
       border: "border-green-100 hover:border-green-200",
@@ -66,7 +72,7 @@ export function TalentCategories() {
           {categories.map((cat) => (
             <Link
               key={cat.name}
-              href={`/talents?category=${cat.name}`}
+              href={`/talents?category=${encodeURIComponent(cat.value)}`}
               className="group h-full"
             >
               <div

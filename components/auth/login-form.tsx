@@ -1,7 +1,8 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 "use client";
 
 import * as z from "zod";
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { LoginSchema } from "@/schemas";
@@ -19,7 +20,7 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import Link from "next/link";
 import { Alert, AlertDescription, AlertTitle } from "../ui/alert";
-import { Ban } from "lucide-react";
+import { Ban, CheckCircle2 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 
 export const LoginForm = () => {
@@ -28,6 +29,13 @@ export const LoginForm = () => {
   const [isPending, startTransition] = useTransition();
   const searchParams = useSearchParams();
   const urlError = searchParams.get("error");
+  const urlSuccess = searchParams.get("success");
+
+  useEffect(() => {
+    if (urlSuccess) {
+      setSuccess(urlSuccess);
+    }
+  }, [urlSuccess]);
 
   const form = useForm<z.infer<typeof LoginSchema>>({
     resolver: zodResolver(LoginSchema),
@@ -59,6 +67,13 @@ export const LoginForm = () => {
           </h1>
           <p className="text-gray-300">Login to access your dashboard</p>
         </div>
+
+        {success && (
+          <div className="bg-green-500/20 border border-green-500/30 backdrop-blur-sm p-4 rounded-lg flex items-start gap-3 animate-in slide-in-from-top-2 duration-300 mb-6">
+            <CheckCircle2 className="w-5 h-5 text-green-300 mt-0.5 shrink-0" />
+            <p className="text-sm text-green-200">{success}</p>
+          </div>
+        )}
 
         {urlError === "Suspended" && (
           <Alert variant="destructive">
@@ -141,23 +156,6 @@ export const LoginForm = () => {
                   />
                 </svg>
                 <p className="text-sm text-red-200">{error}</p>
-              </div>
-            )}
-
-            {success && (
-              <div className="bg-green-500/20 border border-green-500/30 backdrop-blur-sm p-4 rounded-lg flex items-start gap-3 animate-in slide-in-from-top-2 duration-300">
-                <svg
-                  className="w-5 h-5 text-green-300 mt-0.5 shrink-0"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
-                >
-                  <path
-                    fillRule="evenodd"
-                    d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-                    clipRule="evenodd"
-                  />
-                </svg>
-                <p className="text-sm text-green-200">{success}</p>
               </div>
             )}
 

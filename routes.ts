@@ -1,6 +1,16 @@
 export const publicRoutes = ["/", "/auth/new-verification"];
 
-export const publicRoutePrefixes = ["/profile", "/jobs"];
+export const publicRoutePrefixes = [
+  "/",
+  "/jobs",
+  "/talents",
+  "/events",
+  "/success-stories",
+  "/courses",
+  "/about",
+  "/contact",
+  "/new-verification",
+];
 
 export const authRoutes = [
   "/auth/login",
